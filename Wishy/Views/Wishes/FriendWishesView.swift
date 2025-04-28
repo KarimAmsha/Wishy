@@ -127,7 +127,7 @@ struct FriendWishesView: View {
                                                 Text(item.product_id?.name ?? "")
                                                 Spacer()
                                                 HStack {
-                                                    Text(item.product_id?.sale_price?.toString() ?? "")
+                                                    Text(String(format: "%.2f", item.product_id?.sale_price ?? 0))
                                                     Text(LocalizedStringKey.sar)
                                                 }
                                             }

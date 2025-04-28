@@ -254,7 +254,7 @@ struct ProductSummarySection: View {
                         Spacer()
                         VStack(alignment: .leading) {
                             HStack {
-                                Text(item.sale_price?.toString() ?? "")
+                                Text(String(format: "%.2f", item.sale_price ?? 0))
                                 Text(LocalizedStringKey.sar)
                             }
                         }

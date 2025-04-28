@@ -275,7 +275,7 @@ struct WishProductSummarySection: View {
                     Spacer()
                     VStack(alignment: .leading) {
                         HStack {
-                            Text(product.sale_price?.toString() ?? "")
+                            Text(String(format: "%.2f", product.sale_price ?? 0))
                             Text(LocalizedStringKey.sar)
                         }
                     }

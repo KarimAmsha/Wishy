@@ -47,7 +47,7 @@ struct ExplorWishView: View {
 
                         HStack {
                             HStack {
-                                Text(wishesViewModel.wish?.product_id?.sale_price?.toString() ?? "")
+                                Text(String(format: "%.2f", wishesViewModel.wish?.product_id?.sale_price ?? 0))
                                 Text(LocalizedStringKey.sar)
                             }
                             .customFont(weight: .semiBold, size: 14)

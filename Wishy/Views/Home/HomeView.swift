@@ -22,10 +22,9 @@ struct HomeView: View {
         GeometryReader { geometry in
             VStack(alignment: .center, spacing: 16) {
                 HStack {
-                    SearchBar(text: $searchText)
-                        .onTapGesture {
-                            appRouter.navigate(to: .productsSearchView)
-                        }
+                    SearchBar2(text: $searchText) {
+                        appRouter.navigate(to: .productsSearchView)
+                    }
 
                     Button {
                         appRouter.navigate(to: .notifications)

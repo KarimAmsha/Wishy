@@ -61,7 +61,7 @@ struct ProductDetailsView: View {
 
                         HStack {
                             HStack {
-                                Text(viewModel.product?.sale_price?.toString() ?? "")
+                                Text(String(format: "%.2f", viewModel.product?.sale_price ?? 0))
                                 Text(LocalizedStringKey.sar)
                             }
                             .customFont(weight: .semiBold, size: 14)
@@ -205,6 +205,7 @@ extension ProductDetailsView {
         let params: [String: Any] = [
             "product_id": productId ?? "",
             "qty": 1,
+            "variation_id": selectedVariation?.id ?? ""
         ]
         cartViewModel.addToCart(params: params, onsuccess: {
             showMessage()

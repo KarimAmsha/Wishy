@@ -32,7 +32,7 @@ struct CartItemView: View {
                         .foregroundColor(.primaryBlack())
                     
                     HStack {
-                        Text(item.sale_price?.toString() ?? "")
+                        Text(String(format: "%.2f", item.sale_price ?? 0))
                         Text(LocalizedStringKey.sar)
                     }
                     .customFont(weight: .semiBold, size: 12)

@@ -20,6 +20,11 @@ struct ProductsListView: View {
         VStack(alignment: .leading, spacing: 10) {
             HStack {
                 SearchBar(text: $searchText)
+                    .onChange(of: searchText) { newValue in
+                        if newValue.count >= 2 || newValue.isEmpty {
+                            loadData()
+                        }
+                    }
                 
                 Button {
                     appRouter.navigate(to: .notifications)
@@ -38,7 +43,7 @@ struct ProductsListView: View {
                         if let items = viewModel.mainCategoryItems {
                             ForEach(items.indices, id: \.self) { index in
                                 let item = items[index]
-                                MainCategoryItemView(item: item) {
+                                MainCategoryItemView(item: item, isSelected: selectedCategory?.id == item.id) {
                                     selectedCategory = item
                                     loadData()
                                 }
@@ -123,7 +128,7 @@ extension ProductsListView {
         viewModel.products.removeAll()
         params = [
             "isOffer": false,
-            "category_id": selectedCategory != nil ? selectedCategory?.id ?? "" : "",
+            "category_id": selectedCategory?.id ?? "", 
             "special_id": specialCategory?.id ?? "",
             "q": searchText,
             "from_user": false,

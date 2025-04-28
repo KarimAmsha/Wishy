@@ -39,7 +39,7 @@ struct ExplorView: View {
                                 VStack(spacing: 4) {
                                     RatingView(rating: .constant(item.product_id?.rate?.toInt() ?? 0))
                                     HStack {
-                                        Text(item.product_id?.sale_price?.toString() ?? "")
+                                        Text(String(format: "%.2f", item.product_id?.sale_price ?? 0))
                                         Text(LocalizedStringKey.sar)
                                     }
                                     .customFont(weight: .semiBold, size: 14)

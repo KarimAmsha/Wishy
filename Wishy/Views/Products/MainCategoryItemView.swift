@@ -9,6 +9,7 @@ import SwiftUI
 
 struct MainCategoryItemView: View {
     let item: MainCategory
+    let isSelected: Bool
     let onSelect: () -> Void
 
     var body: some View {
@@ -22,16 +23,17 @@ struct MainCategoryItemView: View {
                 contentMode: .fill
             )
             .padding(25)
-            .roundedBackground(cornerRadius: 35, strokeColor: .grayEBF0FF(), lineWidth: 1)
+            .background(isSelected ? Color.primary().opacity(0.2) : Color.white)
+            .clipShape(Circle())
+            .overlay(Circle().stroke(isSelected ? Color.primary() : Color.grayEBF0FF(), lineWidth: 1))
             .padding(.bottom, 4)
             
             Text(item.title ?? "")
                 .customFont(weight: .light, size: 10)
-                .foregroundColor(.gray9098B1())
+                .foregroundColor(isSelected ? .primary() : .gray9098B1())
         }
         .onTapGesture {
             onSelect()
         }
     }
 }
-

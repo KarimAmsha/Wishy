@@ -19,6 +19,9 @@ struct ProductDetailsView: View {
     @State var selectedGroup: Group?
     @State var type: String?
     @StateObject var wishesViewModel = WishesViewModel(errorHandling: ErrorHandling())
+    @State private var selectedOption: String?
+    @State private var selectedName: String = ""
+    @State private var selectedSku: String = ""
 
     var body: some View {
         VStack {
@@ -28,7 +31,6 @@ struct ProductDetailsView: View {
                         LoadingView()
                     }
 
-                    // ZStack to overlay favorite button on top of the image
                     ZStack(alignment: .topTrailing) {
                         AsyncImageView(
                             width: UIScreen.main.bounds.width,
@@ -75,17 +77,51 @@ struct ProductDetailsView: View {
                         Text(viewModel.product?.description ?? "")
                             .customFont(weight: .regular, size: 14)
                             .foregroundColor(.primaryBlack())
+                        
+                        if viewModel.product?.type == "variable",
+                           let attributes = viewModel.product?.attributes,
+                           !attributes.isEmpty {
+
+                            VStack(alignment: .trailing, spacing: 8) {
+                                Text("الأنواع")
+                                    .customFont(weight: .bold, size: 14)
+                                    .foregroundColor(Color.purple)
+
+                                ScrollView(.horizontal, showsIndicators: false) {
+                                    HStack(spacing: 10) {
+                                        ForEach(attributes.flatMap { $0.options ?? [] }, id: \ .sku) { option in
+                                            Text(option.name ?? "")
+                                                .padding(.vertical, 10)
+                                                .padding(.horizontal, 20)
+                                                .background(selectedName == option.name ? Color.purple : Color.gray.opacity(0.1))
+                                                .foregroundColor(selectedName == option.name ? .white : .black)
+                                                .cornerRadius(10)
+                                                .overlay(
+                                                    RoundedRectangle(cornerRadius: 10)
+                                                        .stroke(Color.purple.opacity(selectedName == option.name ? 0 : 0.4), lineWidth: 1)
+                                                )
+                                                .onTapGesture {
+                                                    self.selectedName = option.name ?? ""
+                                                    self.selectedSku = option.sku ?? ""
+                                                }
+                                        }
+                                    }
+                                    .padding(.horizontal, 16)
+                                }
+                            }
+                            .padding(.horizontal)
+                        }
                     }
                     .padding(.horizontal, 16)
                 }
             }
-            
+
             Spacer()
-            
+
             if cartViewModel.isLoading {
                 LoadingView()
             }
-            
+
             CustomDivider()
 
             HStack(spacing: 12) {
@@ -129,127 +165,52 @@ struct ProductDetailsView: View {
                 }
             }
         }
-        .popup(isPresented: $showAddToMyWishes) {
-            GroupListView(onSelect: { group, type in
-                showAddToMyWishes.toggle()
-                self.selectedGroup = group
-                self.type = type ? "public" : "private"
-                DispatchQueue.main.asyncAfter(deadline: .now()+0.2, execute: {
-                    showRetailAlertView.toggle()
-                })
-            }, onCancel: {
-                showAddToMyWishes.toggle()
-            })
-        } customize: {
-            $0
-                .type(.toast)
-                .position(.bottom)
-                .animation(.spring())
-                .closeOnTapOutside(true)
-                .closeOnTap(false)
-                .backgroundColor(Color.black.opacity(0.80))
-                .isOpaque(true)
-                .useKeyboardSafeArea(true)
-        }
-        .popup(isPresented: $showRetailAlertView) {
-            RetailAlertView(onSelect: { isShared in
-                if let group = selectedGroup, let id = group.id, let type = type {
-                    addToMyWish(group_id: id, type: type, isShare: isShared)
-                }
-            }, onCancel: {
-                showRetailAlertView.toggle()
-            })
-        } customize: {
-            $0
-                .type(.toast)
-                .position(.bottom)
-                .animation(.spring())
-                .closeOnTapOutside(true)
-                .closeOnTap(false)
-                .backgroundColor(Color.black.opacity(0.80))
-                .isOpaque(true)
-                .useKeyboardSafeArea(true)
-        }
-        .onChange(of: viewModel.errorMessage) { errorMessage in
-            if let errorMessage = errorMessage {
-                appRouter.togglePopupError(.alertError("", errorMessage))
-            }
-        }
-        .onChange(of: cartViewModel.errorMessage) { errorMessage in
-            if let errorMessage = errorMessage {
-                appRouter.togglePopupError(.alertError("", errorMessage))
-            }
-        }
-        .onChange(of: wishesViewModel.errorMessage) { errorMessage in
-            if let errorMessage = errorMessage {
-                appRouter.togglePopupError(.alertError("", errorMessage))
-            }
-        }
         .onAppear {
             getDetails()
         }
     }
-}
 
-#Preview {
-    ProductDetailsView(viewModel: InitialViewModel(errorHandling: ErrorHandling()), productId: nil)
-        .environmentObject(AppState())
-}
-
-extension ProductDetailsView {
     func getDetails() {
-        viewModel.getProductDetails(id: productId ?? "")
+        viewModel.getProductDetails(id: productId ?? "") 
     }
-    
+
     func addToCart() {
+        // فحص وجود فاريشن ويجب اختياره
+        if let attributes = viewModel.product?.attributes, !attributes.isEmpty, selectedSku.isEmpty {
+            appRouter.togglePopupError(.alertError("", "يرجى اختيار نوع المنتج قبل إضافته إلى السلة."))
+            return
+        }
+
         let params: [String: Any] = [
             "product_id": productId ?? "",
             "qty": 1,
-            "variation_id": selectedVariation?.id ?? ""
+            "variation_name": selectedName,
+            "variation_sku": selectedSku
         ]
         cartViewModel.addToCart(params: params, onsuccess: {
-            showMessage()
+            // handle success
         })
         cartViewModel.cartCount {
+            // refresh count
         }
     }
-    
-    private func showMessage() {
-        let alertModel = AlertModel(
-            icon: "",
-            title: "",
-            message: LocalizedStringKey.cartMessage,
-            hasItem: false,
-            item: "",
-            okTitle: LocalizedStringKey.ok,
-            cancelTitle: LocalizedStringKey.back,
-            hidesIcon: true,
-            hidesCancel: false,
-            onOKAction: {
-                appRouter.togglePopup(nil)
-                appRouter.navigateBack()
-                appState.currentPage = .cart
-            },
-            onCancelAction: {
-                withAnimation {
-                    appRouter.togglePopup(nil)
-                }
-            }
-        )
 
-        appRouter.togglePopup(.alert(alertModel))
-    }
-    
     func addToFavorite() {
         let params: [String: Any] = [
             "product_id": productId ?? ""
-            ]
+        ]
         viewModel.addToFavorite(params: params) {
             getDetails()
         }
     }
-    
+
     func addToMyWish(group_id: String, type: String, isShare: Bool) {
+        // فحص وجود فاريشن ويجب اختياره
+        if let attributes = viewModel.product?.attributes, !attributes.isEmpty, selectedSku.isEmpty {
+            appRouter.togglePopupError(.alertError("", "يرجى اختيار نوع المنتج قبل إضافته إلى السلة."))
+            return
+        }
+
         let body: [String: Any] = [
             "product_id": productId ?? "",
             "group_id": group_id,
@@ -258,7 +219,7 @@ extension ProductDetailsView {
             "total": viewModel.product?.sale_price ?? 0,
             "pays": ""
         ]
-        
+
         wishesViewModel.addWish(params: body) {_,_ in
             appRouter.navigateBack()
         }

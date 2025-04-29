@@ -47,6 +47,13 @@ struct OrderDetailsView: View {
 
                                 VStack(alignment: .leading) {
                                     Text(item.name ?? "")
+                                    
+                                    if let variationName = item.variation_name, !variationName.isEmpty {
+                                        Text("النوع: \(variationName)")
+                                            .customFont(weight: .regular, size: 14)
+                                            .foregroundColor(.gray)
+                                    }
+
                                     HStack {
                                         Text(LocalizedStringKey.quantity)
                                         Text(item.qty?.toString() ?? "")

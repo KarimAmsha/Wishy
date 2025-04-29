@@ -9,7 +9,7 @@ import Foundation
 
 // MARK: - OrderResponse
 struct OrderResponse: Codable {
-    let items: [Order]?
+    let items: [OrderModel]?
     let statusCode: Int?
     let message: String?
     let messageAr: String?
@@ -27,7 +27,7 @@ struct OrderResponse: Codable {
 }
 
 // MARK: - Order
-struct Order: Codable, Identifiable {
+struct OrderModel: Codable, Identifiable {
     let id: String?
     let orderType: Int?
     let orderNo: String?

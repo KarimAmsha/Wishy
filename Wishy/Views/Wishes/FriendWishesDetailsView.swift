@@ -43,7 +43,7 @@ struct FriendWishesDetailsView: View {
 
                         HStack {
                             HStack {
-                                Text(String(format: "%.2f", wishesViewModel.wish.product_id?.sale_price ?? 0))
+                                Text(String(format: "%.2f", wishesViewModel.wish?.product_id?.sale_price ?? 0))
                                 Text(LocalizedStringKey.sar)
                             }
                             .customFont(weight: .semiBold, size: 14)

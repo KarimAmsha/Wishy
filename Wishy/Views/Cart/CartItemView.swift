@@ -31,6 +31,13 @@ struct CartItemView: View {
                         .customFont(weight: .bold, size: 14)
                         .foregroundColor(.primaryBlack())
                     
+                    if let variationName = item.variation_name, !variationName.isEmpty {
+                        Text("النوع: \(variationName)")
+                            .customFont(weight: .regular, size: 12)
+                            .foregroundColor(.gray737373())
+                            .padding(.top, 2)
+                    }
+
                     HStack {
                         Text(String(format: "%.2f", item.sale_price ?? 0))
                         Text(LocalizedStringKey.sar)

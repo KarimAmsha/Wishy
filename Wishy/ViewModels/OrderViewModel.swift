@@ -14,8 +14,8 @@ class OrderViewModel: ObservableObject {
     @Published var totalPages = 1
     @Published var isFetchingMoreData = false
     @Published var pagination: Pagination?
-    @Published var orders: [Order] = []
-    @Published var order: Order?
+    @Published var orders: [OrderModel] = []
+    @Published var order: OrderModel?
     @Published var orderDetailsItem: OrderDetailsItem?
     private let errorHandling: ErrorHandling
     private let dataProvider = DataProvider.shared
@@ -24,6 +24,7 @@ class OrderViewModel: ObservableObject {
     @Published var isLoading: Bool = false
     @Published var coupon: Coupon?
     private var cancellables = Set<AnyCancellable>()
+    @Published var tamaraCheckout: TamaraCheckoutData?
 
     init(errorHandling: ErrorHandling) {
         self.errorHandling = errorHandling
@@ -47,7 +48,7 @@ class OrderViewModel: ObservableObject {
         errorMessage = nil
         let endpoint = DataProvider.Endpoint.addOrder(params: params, token: token)
 
-        dataProvider.request(endpoint: endpoint, responseType: SingleAPIResponse<Order>.self) { [weak self] result in
+        dataProvider.request(endpoint: endpoint, responseType: SingleAPIResponse<OrderModel>.self) { [weak self] result in
             self?.isLoading = false
             print("ssssss \(result)")
             switch result {
@@ -158,7 +159,7 @@ class OrderViewModel: ObservableObject {
         errorMessage = nil
         let endpoint = DataProvider.Endpoint.updateOrderStatus(orderId: orderId, params: params, token: token)
         
-        dataProvider.request(endpoint: endpoint, responseType: SingleAPIResponse<Order>.self) { [weak self] result in
+        dataProvider.request(endpoint: endpoint, responseType: SingleAPIResponse<OrderModel>.self) { [weak self] result in
             guard let self = self else { return }
             self.isLoading = false
             
@@ -232,6 +233,39 @@ class OrderViewModel: ObservableObject {
             }, receiveValue: { [weak self] (response: SingleAPIResponse<Coupon>) in
                 if response.status {
                     self?.coupon = response.items
+                    self?.errorMessage = nil
+                    onsuccess()
+                } else {
+                    // Use the centralized error handling component
+                    self?.handleAPIError(.customError(message: response.message))
+                }
+                self?.isLoading = false
+            })
+            .store(in: &cancellables)
+    }
+    
+    func tamaraCheckout(params: TamaraBody, onsuccess: @escaping () -> Void) {
+        guard let token = userSettings.token else {
+            self.handleAPIError(.customError(message: LocalizedStringKey.tokenError))
+            return
+        }
+        
+        isLoading = true
+        errorMessage = nil
+        let endpoint = DataProvider.Endpoint.tamaraCheckout(params: params.toDict() ?? [:], token: token)
+        
+        DataProvider.shared.request(endpoint: endpoint, responseType: TamaraCheckoutResponse.self)
+            .sink(receiveCompletion: { completion in
+                switch completion {
+                case .finished:
+                    break
+                case .failure(let error):
+                    // Use the centralized error handling component
+                    self.handleAPIError(error)
+                }
+            }, receiveValue: { [weak self] (response: TamaraCheckoutResponse) in
+                if response.status {
+                    self?.tamaraCheckout = response.items
                     self?.errorMessage = nil
                     onsuccess()
                 } else {

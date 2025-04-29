@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct OrderItemView: View {
-    let item: Order
+    let item: OrderModel
     let onSelect: () -> Void
 
     var body: some View {

@@ -44,6 +44,10 @@ struct CartProduct: Codable, Hashable {
     let total: Double?
     let totalDiscount: Double?
 
+    // ✅ أضف هذين السطرين
+    let variation_name: String?
+    let variation_sku: String?
+
     var formattedCreateDate: String? {
         guard let createat = createdAt else { return nil }
         return Utilities.convertDateStringToDate(stringDate: createat, outputFormat: "yyyy-MM-dd")
@@ -67,5 +71,7 @@ struct CartProduct: Codable, Hashable {
         case qty
         case total = "Total"
         case totalDiscount = "TotalDiscount"
+        case variation_name
+        case variation_sku
     }
 }

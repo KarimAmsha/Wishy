@@ -12,6 +12,8 @@ enum PurchaseType: String, CaseIterable, Identifiable {
 
 struct CheckoutView: View {
     @State private var payCash: Bool = true
+    @State private var payMada: Bool = false
+    @State private var payTamara: Bool = false
     @State private var payOnline: Bool = false
     @EnvironmentObject var appRouter: AppRouter
     @StateObject var viewModel = OrderViewModel(errorHandling: ErrorHandling())
@@ -47,6 +49,8 @@ struct CheckoutView: View {
     @State private var notes: String = LocalizedStringKey.notes
     @State var placeholderString = LocalizedStringKey.notes
     @StateObject private var paymentViewModel = PaymentViewModel()
+    @State private var showTamaraPayment = false
+    @State private var checkoutUrl = ""
 
     @State private var selectedAddress: AddressItem? {
         didSet {
@@ -224,6 +228,7 @@ struct CheckoutView: View {
             cartViewModel.cartTotal {
                 //
             }
+            cartViewModel.getCartItems()
             locationManager2.startUpdatingLocation()
             
             GoSellSDK.mode = .production
@@ -246,6 +251,13 @@ struct ProductSummarySection: View {
                     HStack {
                         VStack(alignment: .leading) {
                             Text(item.name ?? "")
+                            
+                            if let variationName = item.variation_name, !variationName.isEmpty {
+                                Text("النوع: \(variationName)")
+                                    .customFont(weight: .regular, size: 14)
+                                    .foregroundColor(.gray)
+                            }
+
                             HStack {
                                 Text(LocalizedStringKey.quantity)
                                 Text(item.qty?.toString() ?? "")
@@ -505,6 +517,49 @@ struct AddressSelectionView: View {
         .padding()
         .background(Color.gray.opacity(0.1))
         .cornerRadius(10)
+        .fullScreenCover(isPresented: $showTamaraPayment) {
+            let merchantURL = TamaraMerchantURL(
+                success: "tamara://checkout/success",
+                failure: "tamara://checkout/failure",
+                cancel: "tamara://checkout/cancel",
+                notification: "tamara://checkout/notification"
+            )
+
+            let tamaraViewModel = TamaraSDKCheckoutSwiftUIViewModel(
+                url: checkoutUrl,
+                merchantURL: merchantURL
+            )
+
+            VStack {
+                VStack(alignment: .leading) {
+                    HStack {
+                        Spacer()
+                        Button {
+                            showTamaraPayment = false
+                        } label: {
+                            Image(systemName: "xmark")
+                                .resizable()
+                                .frame(width: 16, height: 16)
+                                .foregroundColor(Color.gray)
+                                .padding(10)
+                        }
+                    }
+                    .padding()
+                    Divider()
+                }
+
+                TamaraSDKCheckoutSwiftUI(tamaraViewModel)
+                    .onReceive(tamaraViewModel.$successDirection) { _ in
+                        showTamaraPayment = false
+                        addOrder()
+                    }
+                    .onReceive(tamaraViewModel.$failedDirection) { _ in
+                        showTamaraPayment = false
+                    }
+                    .onReceive(tamaraViewModel.$finishLoadingHandler) { _ in }
+            }
+        }
+
     }
     
     func moveToUserLocation() {
@@ -729,5 +784,51 @@ extension CheckoutView {
     func startPayment(amount: Double) {
         paymentViewModel.updateAmount(amount.toString())
         paymentViewModel.startPayment()
+    }
+}
+
+extension CheckoutView {
+    func tamaraCheckout() {
+        if selectedPurchaseType == .myself {
+            guard let selectedAddress = selectedAddress else {
+                orderViewModel.errorMessage = "الرجاء اختيار عنوان"
+                return
+            }
+
+            if selectedAddress.lat == 0.0 || selectedAddress.lng == 0.0 {
+                orderViewModel.errorMessage = "الرجاء اختيار عنوان"
+                return
+            }
+        } else {
+            if region.center.latitude == 0.0 || region.center.longitude == 0.0 {
+                orderViewModel.errorMessage = "الرجاء اختيار عنوان"
+                return
+            }
+        }
+
+        guard let cartTotal = cartViewModel.cartTotal,
+              let cartItems = cartViewModel.cartItems?.results else {
+            orderViewModel.errorMessage = "تعذر جلب بيانات السلة"
+            return
+        }
+
+        let products = cartItems.map {
+            TamaraProduct(
+                product_id: $0.id ?? "",
+                variation_name: $0.variation_name ?? "",
+                variation_sku: $0.variation_sku ?? "",
+                qty: $0.qty ?? 1
+            )
+        }
+
+        let tamaraBody = TamaraBody(
+            amount: cartTotal.final_total ?? 0.0,
+            products: products
+        )
+
+        orderViewModel.tamaraCheckout(params: tamaraBody) {
+            self.checkoutUrl = orderViewModel.tamaraCheckout?.checkout_url ?? ""
+            showTamaraPayment.toggle()
+        }
     }
 }

@@ -88,7 +88,7 @@
 		1EC27FF42C0392060007279D /* UpdateCart.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EC27FF32C0392060007279D /* UpdateCart.swift */; };
 		1EC27FF62C03A4FF0007279D /* CartTotal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EC27FF52C03A4FF0007279D /* CartTotal.swift */; };
 		1EC27FF82C03ACAE0007279D /* OrderViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EC27FF72C03ACAE0007279D /* OrderViewModel.swift */; };
-		1EC27FFA2C03AF740007279D /* Order.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EC27FF92C03AF740007279D /* Order.swift */; };
+		1EC27FFA2C03AF740007279D /* OrderModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EC27FF92C03AF740007279D /* OrderModel.swift */; };
 		1EC27FFC2C03B1AB0007279D /* OrderItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EC27FFB2C03B1AB0007279D /* OrderItemView.swift */; };
 		1ECC94512BDC578A002BFE54 /* LoadingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1ECC94502BDC578A002BFE54 /* LoadingView.swift */; };
 		1ECC94542BDC57D3002BFE54 /* APIEndpoint.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1ECC94532BDC57D3002BFE54 /* APIEndpoint.swift */; };
@@ -233,6 +233,7 @@
 		1EFB9B322C1C40B900C15CE4 /* AddUserProduct.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EFB9B312C1C40B900C15CE4 /* AddUserProduct.swift */; };
 		1EFB9B352C1C4CFE00C15CE4 /* VIPGiftView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EFB9B342C1C4CFE00C15CE4 /* VIPGiftView.swift */; };
 		1EFB9B372C1C624B00C15CE4 /* EventListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EFB9B362C1C624B00C15CE4 /* EventListView.swift */; };
+		52F03F922DC1448F00D11215 /* TamaraProduct.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52F03F912DC1448E00D11215 /* TamaraProduct.swift */; };
 		94771950F80DA90F487D7E9F /* Pods_Wishy.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 07DEBC5BD4B10330520C3633 /* Pods_Wishy.framework */; };
 /* End PBXBuildFile section */
 
@@ -318,7 +319,7 @@
 		1EC27FF32C0392060007279D /* UpdateCart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateCart.swift; sourceTree = "<group>"; };
 		1EC27FF52C03A4FF0007279D /* CartTotal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CartTotal.swift; sourceTree = "<group>"; };
 		1EC27FF72C03ACAE0007279D /* OrderViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrderViewModel.swift; sourceTree = "<group>"; };
-		1EC27FF92C03AF740007279D /* Order.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Order.swift; sourceTree = "<group>"; };
+		1EC27FF92C03AF740007279D /* OrderModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrderModel.swift; sourceTree = "<group>"; };
 		1EC27FFB2C03B1AB0007279D /* OrderItemView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrderItemView.swift; sourceTree = "<group>"; };
 		1ECC94502BDC578A002BFE54 /* LoadingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadingView.swift; sourceTree = "<group>"; };
 		1ECC94532BDC57D3002BFE54 /* APIEndpoint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIEndpoint.swift; sourceTree = "<group>"; };
@@ -437,6 +438,7 @@
 		1EFB9B312C1C40B900C15CE4 /* AddUserProduct.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddUserProduct.swift; sourceTree = "<group>"; };
 		1EFB9B342C1C4CFE00C15CE4 /* VIPGiftView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VIPGiftView.swift; sourceTree = "<group>"; };
 		1EFB9B362C1C624B00C15CE4 /* EventListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventListView.swift; sourceTree = "<group>"; };
+		52F03F912DC1448E00D11215 /* TamaraProduct.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TamaraProduct.swift; sourceTree = "<group>"; };
 		791AC053E8126F8EF63F704E /* Pods-Wishy.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Wishy.release.xcconfig"; path = "Target Support Files/Pods-Wishy/Pods-Wishy.release.xcconfig"; sourceTree = "<group>"; };
 		B678CEDDD4DC7E185B9FEA45 /* Pods-Wishy.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Wishy.debug.xcconfig"; path = "Target Support Files/Pods-Wishy/Pods-Wishy.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -654,6 +656,7 @@
 		1ECC944D2BDC56EE002BFE54 /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				52F03F912DC1448E00D11215 /* TamaraProduct.swift */,
 				1ECC94D52BDC5FB1002BFE54 /* AlertModel.swift */,
 				1ECC94D72BDC5FF7002BFE54 /* CustomModel.swift */,
 				1ECC94EB2BDC6A8C002BFE54 /* WelcomeItem.swift */,
@@ -675,7 +678,7 @@
 				1EC27FED2C0383720007279D /* CartItems.swift */,
 				1EC27FF32C0392060007279D /* UpdateCart.swift */,
 				1EC27FF52C03A4FF0007279D /* CartTotal.swift */,
-				1EC27FF92C03AF740007279D /* Order.swift */,
+				1EC27FF92C03AF740007279D /* OrderModel.swift */,
 				1E28041C2C04C6B00021DFB0 /* Mark.swift */,
 				1E2804202C04C70B0021DFB0 /* AddressItem.swift */,
 				1E2804222C04C7C70021DFB0 /* Complain.swift */,
@@ -1187,6 +1190,7 @@
 				1EDEF6712BE1761F00863C10 /* ConstantView.swift in Sources */,
 				1EA6D3292C1DB15C007E8AE0 /* PaymentState.swift in Sources */,
 				1EFB9B2E2C1BAD9D00C15CE4 /* AddUserProductView.swift in Sources */,
+				52F03F922DC1448F00D11215 /* TamaraProduct.swift in Sources */,
 				1E00533B2C1F051F00C75E42 /* AddReviewView.swift in Sources */,
 				1E2804292C04CECF0021DFB0 /* Contact.swift in Sources */,
 				1ECC94D22BDC5E49002BFE54 /* AsyncImageView.swift in Sources */,
@@ -1216,7 +1220,7 @@
 				1EFB9B372C1C624B00C15CE4 /* EventListView.swift in Sources */,
 				1ECC94F62BDD1291002BFE54 /* UserSettings.swift in Sources */,
 				1EDEF6812BE19DA000863C10 /* ProductDetailsView.swift in Sources */,
-				1EC27FFA2C03AF740007279D /* Order.swift in Sources */,
+				1EC27FFA2C03AF740007279D /* OrderModel.swift in Sources */,
 				1ECC946A2BDC5B68002BFE54 /* Int64+Extensions.swift in Sources */,
 				1EEC2BD02BD83E6000975953 /* WishyApp.swift in Sources */,
 				1ECC95312BDD77B5002BFE54 /* SMSVerificationView.swift in Sources */,

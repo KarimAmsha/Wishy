@@ -178,3 +178,14 @@ struct CustomApiResponse: Codable {
     let messageEn: String?
     let items: String?
 }
+
+struct TamaraCheckoutResponse: Codable {
+    let status: Bool
+    let code: Int
+    let message: String
+    let items: TamaraCheckoutData?
+}
+
+struct TamaraCheckoutData: Codable {
+    let checkout_url: String?
+}

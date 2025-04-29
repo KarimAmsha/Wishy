@@ -444,7 +444,7 @@ class WishesViewModel: ObservableObject {
         errorMessage = nil
         let endpoint = DataProvider.Endpoint.addOrderWish(params: params, token: token)
 
-        DataProvider.shared.request(endpoint: endpoint, responseType: SingleAPIResponse<Order>.self) { [weak self] result in
+        DataProvider.shared.request(endpoint: endpoint, responseType: SingleAPIResponse<OrderModel>.self) { [weak self] result in
             self?.isLoading = false
             switch result {
             case .success(let response):

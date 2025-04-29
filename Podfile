@@ -9,5 +9,6 @@ target 'Wishy' do
 
   # Pods for Wishy
   pod 'goSellSDK'
+  pod 'TamaraSDK'
 
 end

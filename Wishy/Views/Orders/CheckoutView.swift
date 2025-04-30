@@ -2,6 +2,7 @@ import SwiftUI
 import PopupView
 import MapKit
 import goSellSDK
+import TamaraSDK
 
 enum PurchaseType: String, CaseIterable, Identifiable {
     case myself = "شخصي"
@@ -100,7 +101,7 @@ struct CheckoutView: View {
                     NotesView(notes: $notes, placeholder: placeholderString)
                         .disabled(orderViewModel.isLoading)
 
-                    PaymentInformationSection(payCash: $payCash, payOnline: $payOnline)
+                    PaymentInformationSection(payCash: $payCash, payMada: $payMada, payTamara: $payTamara)
                         .disabled(orderViewModel.isLoading)
 
                     if let cartTotal = cartViewModel.cartTotal {
@@ -223,6 +224,48 @@ struct CheckoutView: View {
                 addOrder()
             }
         }
+        .fullScreenCover(isPresented: $showTamaraPayment) {
+            let merchantURL = TamaraMerchantURL(
+                success: "tamara://checkout/success",
+                failure: "tamara://checkout/failure",
+                cancel: "tamara://checkout/cancel",
+                notification: "tamara://checkout/notification"
+            )
+
+            let tamaraViewModel = TamaraSDKCheckoutSwiftUIViewModel(
+                url: checkoutUrl,
+                merchantURL: merchantURL
+            )
+
+            VStack {
+                VStack(alignment: .leading) {
+                    HStack {
+                        Spacer()
+                        Button {
+                            showTamaraPayment = false
+                        } label: {
+                            Image(systemName: "xmark")
+                                .resizable()
+                                .frame(width: 16, height: 16)
+                                .foregroundColor(Color.gray)
+                                .padding(10)
+                        }
+                    }
+                    .padding()
+                    Divider()
+                }
+
+                TamaraSDKCheckoutSwiftUI(tamaraViewModel)
+                    .onReceive(tamaraViewModel.$successDirection) { _ in
+                        showTamaraPayment = false
+                        addOrder()
+                    }
+                    .onReceive(tamaraViewModel.$failedDirection) { _ in
+                        showTamaraPayment = false
+                    }
+                    .onReceive(tamaraViewModel.$finishLoadingHandler) { _ in }
+            }
+        }
         .onAppear {
             userViewModel.getAddressByType(type: servicePlace.rawValue)
             cartViewModel.cartTotal {
@@ -284,8 +327,9 @@ struct ProductSummarySection: View {
 
 struct PaymentInformationSection: View {
     @Binding var payCash: Bool
-    @Binding var payOnline: Bool
-    
+    @Binding var payMada: Bool
+    @Binding var payTamara: Bool
+
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
             Text(LocalizedStringKey.paymentMethod)
@@ -293,9 +337,11 @@ struct PaymentInformationSection: View {
                 .foregroundColor(.black121212())
 
             HStack {
-                CheckboxButton(title: LocalizedStringKey.payCash, isChecked: $payCash, deselect: $payOnline)
+                CheckboxButton(title: LocalizedStringKey.payCash, isChecked: $payCash, other1: $payMada, other2: $payTamara)
                 Spacer()
-                CheckboxButton(title: LocalizedStringKey.payOnline, isChecked: $payOnline, deselect: $payCash)
+                CheckboxButton(title: LocalizedStringKey.payMada, isChecked: $payMada, other1: $payCash, other2: $payTamara)
+                Spacer()
+                CheckboxButton(title: LocalizedStringKey.payTamara, isChecked: $payTamara, other1: $payCash, other2: $payMada)
             }
         }
         .padding()
@@ -307,12 +353,16 @@ struct PaymentInformationSection: View {
 struct CheckboxButton: View {
     let title: String
     @Binding var isChecked: Bool
-    @Binding var deselect: Bool
+    @Binding var other1: Bool
+    @Binding var other2: Bool
     
     var body: some View {
         Button(action: {
-            isChecked.toggle()
-            deselect = !isChecked
+            if !isChecked {
+                isChecked = true
+                other1 = false
+                other2 = false
+            }
         }) {
             HStack(spacing: 10) {
                 Image(systemName: isChecked ? "checkmark.square.fill" : "square")
@@ -339,23 +389,11 @@ struct OrderSummarySection: View {
             if let tax = cartTotal.tax {
                 orderSummaryRow(title: LocalizedStringKey.cartTotalTax, amount: tax)
             }
-            
-//            if let deliveryCost = cartTotal.deliveryCost {
-//                orderSummaryRow(title: LocalizedStringKey.cartTotalDeliveryCost, amount: deliveryCost)
-//            }
-            
-//            if let expressCost = cartTotal.expressCost {
-//                orderSummaryRow(title: LocalizedStringKey.cartTotalExpressCost, amount: expressCost)
-//            }
-            
+
             if let totalPrice = cartTotal.total_price {
                 orderSummaryRow(title: LocalizedStringKey.cartTotalTotalPrice, amount: totalPrice)
             }
-            
-//            if let totalDiscount = cartTotal.total_discount {
-//                orderSummaryRow(title: LocalizedStringKey.cartTotalTotalDiscount, amount: totalDiscount)
-//            }
-            
+  
             if let finalTotal = cartTotal.final_total {
                 orderSummaryRow(title: LocalizedStringKey.cartTotalFinalTotal, amount: finalTotal)
             }
@@ -517,49 +555,6 @@ struct AddressSelectionView: View {
         .padding()
         .background(Color.gray.opacity(0.1))
         .cornerRadius(10)
-        .fullScreenCover(isPresented: $showTamaraPayment) {
-            let merchantURL = TamaraMerchantURL(
-                success: "tamara://checkout/success",
-                failure: "tamara://checkout/failure",
-                cancel: "tamara://checkout/cancel",
-                notification: "tamara://checkout/notification"
-            )
-
-            let tamaraViewModel = TamaraSDKCheckoutSwiftUIViewModel(
-                url: checkoutUrl,
-                merchantURL: merchantURL
-            )
-
-            VStack {
-                VStack(alignment: .leading) {
-                    HStack {
-                        Spacer()
-                        Button {
-                            showTamaraPayment = false
-                        } label: {
-                            Image(systemName: "xmark")
-                                .resizable()
-                                .frame(width: 16, height: 16)
-                                .foregroundColor(Color.gray)
-                                .padding(10)
-                        }
-                    }
-                    .padding()
-                    Divider()
-                }
-
-                TamaraSDKCheckoutSwiftUI(tamaraViewModel)
-                    .onReceive(tamaraViewModel.$successDirection) { _ in
-                        showTamaraPayment = false
-                        addOrder()
-                    }
-                    .onReceive(tamaraViewModel.$failedDirection) { _ in
-                        showTamaraPayment = false
-                    }
-                    .onReceive(tamaraViewModel.$finishLoadingHandler) { _ in }
-            }
-        }
-
     }
     
     func moveToUserLocation() {

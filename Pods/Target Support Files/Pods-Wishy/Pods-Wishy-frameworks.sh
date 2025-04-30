@@ -176,8 +176,11 @@ code_sign_if_enabled() {
 }
 
 if [[ "$CONFIGURATION" == "Debug" ]]; then
+  install_framework "${BUILT_PRODUCTS_DIR}/Alamofire/Alamofire.framework"
   install_framework "${BUILT_PRODUCTS_DIR}/EditableTextInsetsTextFieldV2/EditableTextInsetsTextFieldV2.framework"
+  install_framework "${BUILT_PRODUCTS_DIR}/Moya/Moya.framework"
   install_framework "${BUILT_PRODUCTS_DIR}/SwiftyRSA/SwiftyRSA.framework"
+  install_framework "${BUILT_PRODUCTS_DIR}/TamaraSDK/TamaraSDK.framework"
   install_framework "${BUILT_PRODUCTS_DIR}/TapAdditionsKitV2/TapAdditionsKitV2.framework"
   install_framework "${BUILT_PRODUCTS_DIR}/TapApplicationV2/TapApplicationV2.framework"
   install_framework "${BUILT_PRODUCTS_DIR}/TapBundleLocalizationV2/TapBundleLocalizationV2.framework"
@@ -195,8 +198,11 @@ if [[ "$CONFIGURATION" == "Debug" ]]; then
   install_framework "${BUILT_PRODUCTS_DIR}/goSellSDK/goSellSDK.framework"
 fi
 if [[ "$CONFIGURATION" == "Release" ]]; then
+  install_framework "${BUILT_PRODUCTS_DIR}/Alamofire/Alamofire.framework"
   install_framework "${BUILT_PRODUCTS_DIR}/EditableTextInsetsTextFieldV2/EditableTextInsetsTextFieldV2.framework"
+  install_framework "${BUILT_PRODUCTS_DIR}/Moya/Moya.framework"
   install_framework "${BUILT_PRODUCTS_DIR}/SwiftyRSA/SwiftyRSA.framework"
+  install_framework "${BUILT_PRODUCTS_DIR}/TamaraSDK/TamaraSDK.framework"
   install_framework "${BUILT_PRODUCTS_DIR}/TapAdditionsKitV2/TapAdditionsKitV2.framework"
   install_framework "${BUILT_PRODUCTS_DIR}/TapApplicationV2/TapApplicationV2.framework"
   install_framework "${BUILT_PRODUCTS_DIR}/TapBundleLocalizationV2/TapBundleLocalizationV2.framework"

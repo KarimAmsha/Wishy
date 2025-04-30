@@ -34,6 +34,8 @@ struct Products: Codable, Hashable {
     let quantity: Int?
     let SKU: String?
     let attributes: [Attribute]?
+    let variation_name: String?
+    let variation_sku: String?
 
     // MARK: - Computed properties
 
@@ -95,6 +97,8 @@ struct Products: Codable, Hashable {
         case quantity
         case SKU
         case attributes
+        case variation_name
+        case variation_sku
     }
     
     init(from decoder: Decoder) throws {
@@ -128,6 +132,8 @@ struct Products: Codable, Hashable {
         
         let decodedType = try container.decodeIfPresent(String.self, forKey: .type)
         type = (decodedType?.isEmpty ?? true) ? "simple" : decodedType!
+        variation_name = try container.decodeIfPresent(String.self, forKey: .variation_name)
+        variation_sku = try container.decodeIfPresent(String.self, forKey: .variation_sku)
     }
 }
 
@@ -155,6 +161,8 @@ struct OrderProducts: Codable, Hashable {
     let quantity: Int?
     let SKU: String?
     let attributes: [Attribute]?
+    let variation_name: String?
+    let variation_sku: String?
 
     // MARK: - Computed Properties
 
@@ -209,6 +217,8 @@ struct OrderProducts: Codable, Hashable {
         case quantity
         case SKU
         case attributes
+        case variation_name
+        case variation_sku
     }
     
     init(from decoder: Decoder) throws {
@@ -242,6 +252,8 @@ struct OrderProducts: Codable, Hashable {
         } else {
             type = "simple"
         }
+        variation_name = try container.decodeIfPresent(String.self, forKey: .variation_name)
+        variation_sku = try container.decodeIfPresent(String.self, forKey: .variation_sku)
     }
 }
 

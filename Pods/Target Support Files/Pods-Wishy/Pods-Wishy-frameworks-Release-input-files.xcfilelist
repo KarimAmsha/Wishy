@@ -1,6 +1,9 @@
 ${PODS_ROOT}/Target Support Files/Pods-Wishy/Pods-Wishy-frameworks.sh
+${BUILT_PRODUCTS_DIR}/Alamofire/Alamofire.framework
 ${BUILT_PRODUCTS_DIR}/EditableTextInsetsTextFieldV2/EditableTextInsetsTextFieldV2.framework
+${BUILT_PRODUCTS_DIR}/Moya/Moya.framework
 ${BUILT_PRODUCTS_DIR}/SwiftyRSA/SwiftyRSA.framework
+${BUILT_PRODUCTS_DIR}/TamaraSDK/TamaraSDK.framework
 ${BUILT_PRODUCTS_DIR}/TapAdditionsKitV2/TapAdditionsKitV2.framework
 ${BUILT_PRODUCTS_DIR}/TapApplicationV2/TapApplicationV2.framework
 ${BUILT_PRODUCTS_DIR}/TapBundleLocalizationV2/TapBundleLocalizationV2.framework

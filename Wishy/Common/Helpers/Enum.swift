@@ -994,6 +994,9 @@ enum LocalizedStringKey {
     static let eventsPreparing = "Events".localized
     static let estimatedAmount = "Estimated amount".localized
     static let cartMessage = "Your order has been successfully added to the cart, do you want to go to the cart?".localized
+    static let payMada = "Pay Mada".localized
+    static let payTamara = "Pay Tamara".localized
+
 }
 
 enum LocalizedError {

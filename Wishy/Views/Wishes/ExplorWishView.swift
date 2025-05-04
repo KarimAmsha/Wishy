@@ -130,7 +130,7 @@ struct ExplorWishView: View {
         }
         .onChange(of: wishesViewModel.errorMessage) { errorMessage in
             if let errorMessage = errorMessage {
-                appRouter.togglePopupError(.alertError("", errorMessage))
+                appRouter.toggleAppPopup(.alertError("", errorMessage))
             }
         }
         .onAppear {

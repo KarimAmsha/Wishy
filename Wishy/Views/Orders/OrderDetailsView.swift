@@ -193,7 +193,7 @@ struct OrderDetailsView: View {
         }
         .onChange(of: viewModel.errorMessage) { errorMessage in
             if let errorMessage = errorMessage {
-                appRouter.togglePopupError(.alertError(LocalizedStringKey.error, errorMessage))
+                appRouter.toggleAppPopup(.alertError(LocalizedStringKey.error, errorMessage))
             }
         }
     }

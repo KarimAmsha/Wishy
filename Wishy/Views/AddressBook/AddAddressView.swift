@@ -183,7 +183,7 @@ struct AddAddressView: View {
                 )
             }
         }
-        .dismissKeyboard()
+        .dismissKeyboardOnTap()
         .navigationBarBackButtonHidden()
         .background(Color.background())
         .toolbar {
@@ -219,7 +219,7 @@ struct AddAddressView: View {
         }
         .onChange(of: viewModel.errorMessage) { errorMessage in
             if let errorMessage = errorMessage {
-                appRouter.togglePopupError(.alertError("", errorMessage))
+                appRouter.toggleAppPopup(.alertError("", errorMessage))
             }
         }
     }
@@ -267,7 +267,7 @@ struct AddAddressView: View {
 extension AddAddressView {
     private func add() {
         guard !title.isEmpty else {
-            appRouter.togglePopupError(.alertError("", LocalizedStringKey.addressTitleRequired))
+            appRouter.toggleAppPopup(.alertError("", LocalizedStringKey.addressTitleRequired))
             return
         }
 

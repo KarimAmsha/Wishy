@@ -79,7 +79,7 @@ struct MyOrdersView: View {
         }
         .onChange(of: viewModel.errorMessage) { errorMessage in
             if let errorMessage = errorMessage {
-                appRouter.togglePopupError(.alertError("", errorMessage))
+                appRouter.toggleAppPopup(.alertError("", errorMessage))
             }
         }
         .onAppear {

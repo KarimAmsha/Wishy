@@ -23,6 +23,7 @@ class WishesViewModel: ObservableObject {
     @Published var explor: [Wish] = []
     @Published var wishes: [Wish] = []
     @Published var wish: Wish?
+    @Published var isSuccess: Bool = false
 
     init(errorHandling: ErrorHandling) {
         self.errorHandling = errorHandling
@@ -314,14 +315,17 @@ class WishesViewModel: ObservableObject {
             switch result {
             case .success(let response):
                 if response.status {
+                    self.isSuccess = true
                     self.errorMessage = response.message
                     onsuccess(response.items?.id ?? "", response.message)
                 } else {
                     // Handle API error and update UI
+                    self.isSuccess = false
                     handleAPIError(.customError(message: response.message))
                 }
             case .failure(let error):
                 // Use the centralized error handling component
+                self.isSuccess = false
                 self.handleAPIError(error)
             }
         }

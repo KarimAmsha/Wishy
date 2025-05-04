@@ -59,23 +59,27 @@ struct ProductsListView: View {
             
             VStack(alignment: .center, spacing: 12) {
                 ScrollView(showsIndicators: false) {
-                    if viewModel.products.isEmpty {
+                    if viewModel.isFetchingInitialProducts {
+                        LoadingView().padding(.top, 40)
+                    } else if viewModel.products.isEmpty {
                         DefaultEmptyView(title: LocalizedStringKey.noDataFound)
                     } else {
                         LazyVGrid(columns: [GridItem(.flexible(), spacing: 16), GridItem(.flexible(), spacing: 16)], spacing: 16) {
                             ForEach(viewModel.products, id: \.id) { item in
-                                ProductItemView(item: item, onSelect: {
-                                    appRouter.navigate(to: .productDetails(item.id ?? ""))
-                                })
-                                
+                                ForEach(viewModel.products, id: \.id) { item in
+                                    ProductItemView(item: item, onSelect: {
+                                        appRouter.navigate(to: .productDetails(item.id ?? ""))
+                                    })
+                                }
+
                                 if viewModel.shouldLoadMoreData {
-                                    Color.clear.onAppear {
+                                    Color.clear.frame(height: 1).onAppear {
                                         loadMore()
                                     }
                                 }
-                                
+
                                 if viewModel.isFetchingMoreData {
-                                    LoadingView()
+                                    LoadingView().padding(.top, 10)
                                 }
                             }
                         }
@@ -105,7 +109,7 @@ struct ProductsListView: View {
         }
         .onChange(of: viewModel.errorMessage) { errorMessage in
             if let errorMessage = errorMessage {
-                appRouter.togglePopupError(.alertError("", errorMessage))
+                appRouter.toggleAppPopup(.alertError("", errorMessage))
             }
         }
         .onAppear {

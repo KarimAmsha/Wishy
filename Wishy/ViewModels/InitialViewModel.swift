@@ -30,6 +30,7 @@ class InitialViewModel: ObservableObject {
     @Published var favoriteItem: FavoriteItem?
     @Published var favoriteItems: [FavoriteItems] = []
     @Published var whatsAppContactItem: Contact?
+    @Published var isFetchingInitialProducts: Bool = false
 
     init(errorHandling: ErrorHandling) {
         self.errorHandling = errorHandling
@@ -238,6 +239,11 @@ class InitialViewModel: ObservableObject {
             handleAPIError(.customError(message: LocalizedStringKey.tokenError))
             return
         }
+        
+        if page == 0 || page == nil {
+            self.products = []
+            isFetchingInitialProducts = true
+        }
 
         isFetchingMoreData = true
         errorMessage = nil
@@ -248,6 +254,7 @@ class InitialViewModel: ObservableObject {
             guard let self = self else { return }
             self.isLoading = false
             self.isFetchingMoreData = false
+            self.isFetchingInitialProducts = false
 
             switch result {
             case .success(let response):
@@ -287,6 +294,7 @@ class InitialViewModel: ObservableObject {
             return
         }
 
+        self.product = nil
         isLoading = true
         errorMessage = nil
         let endpoint = DataProvider.Endpoint.getProductDetails(id: id, token: token)

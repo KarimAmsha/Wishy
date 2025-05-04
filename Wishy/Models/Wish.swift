@@ -65,8 +65,8 @@ struct AddWish: Codable, Hashable {
     let product_id: String?
     let isShare: Bool?
     let type: String?
-    let total: Int?
-    let all_pays: Int?
+    let total: Double?
+    let all_pays: Double?
     let user_id: String?
     let pays: [Pay]?
     let createAt: String?

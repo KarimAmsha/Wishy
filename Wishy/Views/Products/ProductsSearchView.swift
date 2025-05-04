@@ -29,29 +29,34 @@ struct ProductsSearchView: View {
                 LoadingView()
             }
             
-            VStack(alignment: .center, spacing: 12) {
-                ScrollView(showsIndicators: false) {
-                    if viewModel.products.isEmpty {
-                        DefaultEmptyView(title: LocalizedStringKey.noDataFound)
-                    } else {
-                        LazyVGrid(columns: [GridItem(.flexible(), spacing: 16), GridItem(.flexible(), spacing: 16)], spacing: 16) {
-                            ForEach(viewModel.products, id: \.id) { item in
-                                ProductItemView(item: item, onSelect: {
-                                    appRouter.navigate(to: .productDetails(item.id ?? ""))
-                                })
-                                
-                                if viewModel.shouldLoadMoreData {
-                                    Color.clear.onAppear {
-                                        loadMore()
-                                    }
-                                }
-                                
-                                if viewModel.isFetchingMoreData {
-                                    LoadingView()
-                                }
+            ScrollView(showsIndicators: false) {
+                if viewModel.isFetchingInitialProducts {
+                    LoadingView().padding(.top, 40)
+                } else if viewModel.products.isEmpty {
+                    DefaultEmptyView(title: LocalizedStringKey.noDataFound)
+                } else {
+                    LazyVGrid(columns: [
+                        GridItem(.flexible(), spacing: 16),
+                        GridItem(.flexible(), spacing: 16)
+                    ], spacing: 16) {
+                        ForEach(viewModel.products, id: \.id) { item in
+                            ProductItemView(item: item, onSelect: {
+                                appRouter.navigate(to: .productDetails(item.id ?? ""))
+                            })
+                        }
+
+                        if viewModel.shouldLoadMoreData {
+                            Color.clear.onAppear {
+                                loadMore()
                             }
                         }
+
+                        if viewModel.isFetchingMoreData {
+                            LoadingView()
+                        }
                     }
+                    .transition(.opacity) // optional for nice fade-in
+                    .animation(.easeInOut(duration: 0.3), value: viewModel.products)
                 }
             }
 
@@ -77,14 +82,16 @@ struct ProductsSearchView: View {
         }
         .onChange(of: viewModel.errorMessage) { errorMessage in
             if let errorMessage = errorMessage {
-                appRouter.togglePopupError(.alertError("", errorMessage))
+                appRouter.toggleAppPopup(.alertError("", errorMessage))
             }
         }
         .onChange(of: searchText) { searchText in
             loadData()
         }
         .onAppear {
-            loadData()
+            if viewModel.products.isEmpty {
+                loadData()
+            }
         }
     }
 }

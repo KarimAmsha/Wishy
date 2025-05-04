@@ -79,7 +79,7 @@ struct AddBalanceView: View {
         }
         .onChange(of: viewModel.errorMessage) { errorMessage in
             if !errorMessage.isEmpty {
-                appRouter.togglePopupError(.alertError("", errorMessage))
+                appRouter.toggleAppPopup(.alertError("", errorMessage))
             }
         }
         .onChange(of: viewModel.paymentSuccess) { paymentSuccess in

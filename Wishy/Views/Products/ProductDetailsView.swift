@@ -22,12 +22,13 @@ struct ProductDetailsView: View {
     @State private var selectedOption: String?
     @State private var selectedName: String = ""
     @State private var selectedSku: String = ""
+    @State private var showAddToCartPopup = false
 
     var body: some View {
         VStack {
             ScrollView(showsIndicators: false) {
                 VStack(alignment: .leading, spacing: 8) {
-                    if viewModel.isLoading {
+                    if viewModel.isLoading || viewModel.product == nil {
                         LoadingView()
                     }
 
@@ -74,18 +75,14 @@ struct ProductDetailsView: View {
                             RatingView(rating: .constant(viewModel.product?.rate?.toInt() ?? 0))
                         }
                         
-                        Text(viewModel.product?.description ?? "")
-                            .customFont(weight: .regular, size: 14)
-                            .foregroundColor(.primaryBlack())
-                        
                         if viewModel.product?.type == "variable",
                            let attributes = viewModel.product?.attributes,
                            !attributes.isEmpty {
 
-                            VStack(alignment: .trailing, spacing: 8) {
+                            VStack(alignment: .leading, spacing: 8) {
                                 Text("الأنواع")
                                     .customFont(weight: .bold, size: 14)
-                                    .foregroundColor(Color.purple)
+                                    .foregroundColor(.primary())
 
                                 ScrollView(.horizontal, showsIndicators: false) {
                                     HStack(spacing: 10) {
@@ -93,12 +90,12 @@ struct ProductDetailsView: View {
                                             Text(option.name ?? "")
                                                 .padding(.vertical, 10)
                                                 .padding(.horizontal, 20)
-                                                .background(selectedName == option.name ? Color.purple : Color.gray.opacity(0.1))
+                                                .background(selectedName == option.name ? Color.primary() : Color.gray.opacity(0.1))
                                                 .foregroundColor(selectedName == option.name ? .white : .black)
                                                 .cornerRadius(10)
                                                 .overlay(
                                                     RoundedRectangle(cornerRadius: 10)
-                                                        .stroke(Color.purple.opacity(selectedName == option.name ? 0 : 0.4), lineWidth: 1)
+                                                        .stroke(Color.primary().opacity(selectedName == option.name ? 0 : 0.4), lineWidth: 1)
                                                 )
                                                 .onTapGesture {
                                                     self.selectedName = option.name ?? ""
@@ -109,8 +106,11 @@ struct ProductDetailsView: View {
                                     .padding(.horizontal, 16)
                                 }
                             }
-                            .padding(.horizontal)
                         }
+                        
+                        Text(viewModel.product?.description ?? "")
+                            .customFont(weight: .regular, size: 14)
+                            .foregroundColor(.primaryBlack())
                     }
                     .padding(.horizontal, 16)
                 }
@@ -137,6 +137,11 @@ struct ProductDetailsView: View {
                 .padding(.horizontal, 16)
 
                 Button {
+                    if let attributes = viewModel.product?.attributes, !attributes.isEmpty, selectedSku.isEmpty {
+                        appRouter.toggleAppPopup(.alertError("", "يرجى اختيار نوع المنتج قبل إضافته إلى امنياتي."))
+                        return
+                    }
+
                     showAddToMyWishes.toggle()
                 } label: {
                     HStack(spacing: 4) {
@@ -165,6 +170,78 @@ struct ProductDetailsView: View {
                 }
             }
         }
+        .popup(isPresented: $showAddToMyWishes) {
+            GroupListView(onSelect: { group, type in
+                showAddToMyWishes.toggle()
+                self.selectedGroup = group
+                self.type = type ? "public" : "private"
+                DispatchQueue.main.asyncAfter(deadline: .now()+0.2, execute: {
+                    showRetailAlertView.toggle()
+                })
+            }, onCancel: {
+                showAddToMyWishes.toggle()
+            })
+        } customize: {
+            $0
+                .type(.toast)
+                .position(.bottom)
+                .animation(.spring())
+                .closeOnTapOutside(true)
+                .closeOnTap(false)
+                .backgroundColor(Color.black.opacity(0.80))
+                .isOpaque(true)
+                .useKeyboardSafeArea(true)
+        }
+        .popup(isPresented: $showRetailAlertView) {
+            RetailAlertView(onSelect: { isShared in
+                if let group = selectedGroup, let id = group.id, let type = type {
+                    addToMyWish(group_id: id, type: type, isShare: isShared)
+                }
+            }, onCancel: {
+                showRetailAlertView.toggle()
+            })
+        } customize: {
+            $0
+                .type(.toast)
+                .position(.bottom)
+                .animation(.spring())
+                .closeOnTapOutside(true)
+                .closeOnTap(false)
+                .backgroundColor(Color.black.opacity(0.80))
+                .isOpaque(true)
+                .useKeyboardSafeArea(true)
+        }
+        .popup(isPresented: $showAddToCartPopup) {
+            AddToCartPopup(isPresented: $showAddToCartPopup) {
+                appState.currentPage = .cart
+            }
+        } customize: {
+            $0
+                .type(.floater(verticalPadding: 60))
+                .position(.bottom)
+                .animation(.spring())
+                .closeOnTapOutside(true)
+                .backgroundColor(Color.black.opacity(0.4))
+        }
+        .onChange(of: viewModel.errorMessage) { errorMessage in
+            if let errorMessage = errorMessage {
+                appRouter.toggleAppPopup(.alertError("", errorMessage))
+            }
+        }
+        .onChange(of: wishesViewModel.errorMessage) { message in
+            if let message = message {
+                if wishesViewModel.isSuccess {
+                    appRouter.toggleAppPopup(.alertSuccess("", message))
+                } else {
+                    appRouter.toggleAppPopup(.alertError("", message))
+                }
+            }
+        }
+        .onChange(of: cartViewModel.errorMessage) { errorMessage in
+            if let errorMessage = errorMessage {
+                appRouter.toggleAppPopup(.alertError("", errorMessage))
+            }
+        }
         .onAppear {
             getDetails()
         }
@@ -175,9 +252,8 @@ struct ProductDetailsView: View {
     }
 
     func addToCart() {
-        // فحص وجود فاريشن ويجب اختياره
         if let attributes = viewModel.product?.attributes, !attributes.isEmpty, selectedSku.isEmpty {
-            appRouter.togglePopupError(.alertError("", "يرجى اختيار نوع المنتج قبل إضافته إلى السلة."))
+            appRouter.toggleAppPopup(.alertError("", "يرجى اختيار نوع المنتج قبل إضافته إلى السلة."))
             return
         }
 
@@ -189,6 +265,9 @@ struct ProductDetailsView: View {
         ]
         cartViewModel.addToCart(params: params, onsuccess: {
             // handle success
+            DispatchQueue.main.async {
+                self.showAddToCartPopup = true
+            }
         })
         cartViewModel.cartCount {
             // refresh count
@@ -205,23 +284,61 @@ struct ProductDetailsView: View {
     }
 
     func addToMyWish(group_id: String, type: String, isShare: Bool) {
-        // فحص وجود فاريشن ويجب اختياره
-        if let attributes = viewModel.product?.attributes, !attributes.isEmpty, selectedSku.isEmpty {
-            appRouter.togglePopupError(.alertError("", "يرجى اختيار نوع المنتج قبل إضافته إلى السلة."))
-            return
-        }
-
         let body: [String: Any] = [
             "product_id": productId ?? "",
             "group_id": group_id,
             "type": type,
             "isShare": String(isShare),
             "total": viewModel.product?.sale_price ?? 0,
-            "pays": ""
+            "pays": "",
+            "variation_name": selectedName,
+            "variation_sku": selectedSku
         ]
 
         wishesViewModel.addWish(params: body) {_,_ in
             appRouter.navigateBack()
         }
+    }
+}
+
+struct AddToCartPopup: View {
+    @Binding var isPresented: Bool
+    var onGoToCart: () -> Void
+
+    var body: some View {
+        VStack(spacing: 16) {
+            Text("🎉 تمت إضافة المنتج إلى السلة")
+                .customFont(weight: .bold, size: 16)
+                .multilineTextAlignment(.center)
+
+            HStack(spacing: 16) {
+                Button(action: {
+                    isPresented = false
+                }) {
+                    Text("استمرار بالتسوق")
+                        .padding()
+                        .frame(maxWidth: .infinity)
+                        .background(Color.primaryLight())
+                        .foregroundColor(.primary())
+                        .cornerRadius(10)
+                }
+
+                Button(action: {
+                    isPresented = false
+                    onGoToCart()
+                }) {
+                    Text("الذهاب إلى السلة")
+                        .padding()
+                        .frame(maxWidth: .infinity)
+                        .background(Color.primary())
+                        .foregroundColor(.white)
+                        .cornerRadius(10)
+                }
+            }
+        }
+        .padding()
+        .background(Color.white)
+        .cornerRadius(16)
+        .padding()
     }
 }

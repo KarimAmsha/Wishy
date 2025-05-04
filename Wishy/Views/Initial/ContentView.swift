@@ -36,7 +36,7 @@ struct ContentView: View {
         }
 //        .onChange(of: monitor.status) { status in
 //            if status == .disconnected {
-//                appRouter.togglePopupError(.alertError(LocalizedStringKey.error, LocalizedError.noInternetConnection))
+//                appRouter.toggleAppPopup(.alertError(LocalizedStringKey.error, LocalizedError.noInternetConnection))
 //            }
 //        }
         .onAppear {

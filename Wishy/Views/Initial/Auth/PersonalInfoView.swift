@@ -152,7 +152,7 @@ struct PersonalInfoView: View {
                 }
             }
         }
-        .dismissKeyboard()
+        .dismissKeyboardOnTap()
         .fullScreenCover(isPresented: $mediaPickerViewModel.isPresentingImagePicker, content: {
             ImagePicker(sourceType: mediaPickerViewModel.sourceType, completionHandler: mediaPickerViewModel.didSelectImage)
         })
@@ -205,7 +205,7 @@ struct PersonalInfoView: View {
         }
         .onChange(of: viewModel.errorMessage) { errorMessage in
             if let errorMessage = errorMessage {
-                appRouter.togglePopupError(.alertError("", errorMessage))
+                appRouter.toggleAppPopup(.alertError("", errorMessage))
             }
         }
         .popup(isPresented: $isShowingDatePicker) {

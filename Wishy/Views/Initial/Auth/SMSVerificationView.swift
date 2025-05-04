@@ -91,7 +91,7 @@ struct SMSVerificationView: View {
 
         }
         .padding(24)
-        .dismissKeyboard()
+        .dismissKeyboardOnTap()
         .navigationBarBackButtonHidden()
         .background(Color.background())
         .toolbar {
@@ -112,7 +112,7 @@ struct SMSVerificationView: View {
         }
         .onChange(of: viewModel.errorMessage) { errorMessage in
             if let errorMessage = errorMessage {
-                appRouter.togglePopupError(.alertError(LocalizedStringKey.error, errorMessage))
+                appRouter.toggleAppPopup(.alertError(LocalizedStringKey.error, errorMessage))
             }
         }
     }

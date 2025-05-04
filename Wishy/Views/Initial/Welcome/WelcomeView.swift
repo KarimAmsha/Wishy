@@ -94,13 +94,17 @@ struct WelcomeView: View {
                     }
                 }
                 .popup(isPresented: Binding<Bool>(
-                    get: { appRouter.activePopupError != nil },
+                    get: { appRouter.appPopup != nil },
                     set: { _ in appRouter.togglePopupError(nil) })
                 ) {
-                   if let popup = appRouter.activePopupError {
+                   if let popup = appRouter.appPopup {
                        switch popup {
                        case .alertError(let title, let message):
-                           GeneralErrorToastView(title: title, message: message)
+                           GeneralToastView(type: .error, title: title, message: message)
+                       case .alertSuccess(let title, let message):
+                           GeneralToastView(type: .success, title: title, message: message)
+                       case .alertInfo(let title, let message):
+                           GeneralToastView(type: .info, title: title, message: message)
                        }
                    }
                 } customize: {

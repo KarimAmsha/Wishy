@@ -180,12 +180,12 @@ struct CheckoutView: View {
         }
         .onChange(of: orderViewModel.errorMessage) { errorMessage in
             if let errorMessage = errorMessage {
-                appRouter.togglePopupError(.alertError("", errorMessage))
+                appRouter.toggleAppPopup(.alertError("", errorMessage))
             }
         }
         .onChange(of: cartViewModel.errorMessage) { errorMessage in
             if let errorMessage = errorMessage {
-                appRouter.togglePopupError(.alertError("", errorMessage))
+                appRouter.toggleAppPopup(.alertError("", errorMessage))
             }
         }
         .onChange(of: locationManager2.location) { value in
@@ -210,12 +210,12 @@ struct CheckoutView: View {
         }
         .onChange(of: paymentViewModel.errorMessage) { errorMessage in
             if !errorMessage.isEmpty {
-                appRouter.togglePopupError(.alertError("", errorMessage))
+                appRouter.toggleAppPopup(.alertError("", errorMessage))
             }
         }
         .onChange(of: orderViewModel.errorMessage) { errorMessage in
             if let errorMessage = errorMessage {
-                appRouter.togglePopupError(.alertError("", errorMessage))
+                appRouter.toggleAppPopup(.alertError("", errorMessage))
             }
         }
         .onChange(of: paymentViewModel.paymentSuccess) { paymentSuccess in

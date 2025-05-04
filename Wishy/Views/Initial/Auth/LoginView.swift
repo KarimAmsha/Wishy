@@ -73,7 +73,7 @@ struct LoginView: View {
         .padding(24)
         .toolbarColorScheme(.light, for: .navigationBar)
         .toolbarBackground(Color.white,for: .navigationBar)
-        .dismissKeyboard()
+        .dismissKeyboardOnTap()
         .background(Color.white)
         .sheet(isPresented: $presentSheet) {
             NavigationStack {
@@ -131,7 +131,7 @@ struct LoginView: View {
         }
         .onChange(of: viewModel.errorMessage) { errorMessage in
             if let errorMessage = errorMessage {
-                appRouter.togglePopupError(.alertError("", errorMessage))
+                appRouter.toggleAppPopup(.alertError("", errorMessage))
             }
         }
     }

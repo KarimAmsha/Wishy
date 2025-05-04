@@ -94,12 +94,12 @@ struct RetailPaymentView: View {
         }
         .onChange(of: wishesViewModel.errorMessage) { errorMessage in
             if let errorMessage = errorMessage {
-                appRouter.togglePopupError(.alertError("", errorMessage))
+                appRouter.toggleAppPopup(.alertError("", errorMessage))
             }
         }
         .onChange(of: paymentViewModel.errorMessage) { errorMessage in
             if !errorMessage.isEmpty {
-                appRouter.togglePopupError(.alertError("", errorMessage))
+                appRouter.toggleAppPopup(.alertError("", errorMessage))
             }
         }
         .onChange(of: paymentViewModel.paymentSuccess) { paymentSuccess in

@@ -223,25 +223,7 @@ struct ProductDetailsView: View {
                 .closeOnTapOutside(true)
                 .backgroundColor(Color.black.opacity(0.4))
         }
-        .onChange(of: viewModel.errorMessage) { errorMessage in
-            if let errorMessage = errorMessage {
-                appRouter.toggleAppPopup(.alertError("", errorMessage))
-            }
-        }
-        .onChange(of: wishesViewModel.errorMessage) { message in
-            if let message = message {
-                if wishesViewModel.isSuccess {
-                    appRouter.toggleAppPopup(.alertSuccess("", message))
-                } else {
-                    appRouter.toggleAppPopup(.alertError("", message))
-                }
-            }
-        }
-        .onChange(of: cartViewModel.errorMessage) { errorMessage in
-            if let errorMessage = errorMessage {
-                appRouter.toggleAppPopup(.alertError("", errorMessage))
-            }
-        }
+        .overlay(alertObservers)
         .onAppear {
             getDetails()
         }
@@ -299,6 +281,26 @@ struct ProductDetailsView: View {
             appRouter.navigateBack()
         }
     }
+    
+    var alertObservers: some View {
+        VStack {
+            MessageAlertObserverView(
+                message: $viewModel.errorMessage,
+                alertType: .constant(.error)
+            )
+
+            MessageAlertObserverView(
+                message: $cartViewModel.errorMessage,
+                alertType: .constant(.error)
+            )
+
+            MessageAlertObserverView(
+                message: $wishesViewModel.errorMessage,
+                alertType: $wishesViewModel.alertType.orDefault(.error)
+            )
+        }
+        .opacity(0)
+    }
 }
 
 struct AddToCartPopup: View {
@@ -342,3 +344,4 @@ struct AddToCartPopup: View {
         .padding()
     }
 }
+

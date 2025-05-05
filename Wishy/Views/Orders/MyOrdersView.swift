@@ -34,8 +34,7 @@ struct MyOrdersView: View {
                         DefaultEmptyView(title: LocalizedStringKey.noOrdersFound)
                     } else {
                         let orders = viewModel.orders
-                        ForEach(orders.indices, id: \.self) { index in
-                            let item = orders[index]
+                        ForEach(orders, id: \.id) { item in
                             OrderItemView(item: item, onSelect: {
                                 appRouter.navigate(to: .orderDetails(item.id ?? ""))
                             })
@@ -77,11 +76,12 @@ struct MyOrdersView: View {
         .onChange(of: orderType) { type in
             loadData()
         }
-        .onChange(of: viewModel.errorMessage) { errorMessage in
-            if let errorMessage = errorMessage {
-                appRouter.toggleAppPopup(.alertError("", errorMessage))
-            }
-        }
+        .overlay(
+            MessageAlertObserverView(
+                message: $viewModel.errorMessage,
+                alertType: .constant(.error)
+            )
+        )
         .onAppear {
             loadData()
         }

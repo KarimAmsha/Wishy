@@ -75,6 +75,12 @@ struct MyWishView: View {
                         ProgressLineView(percentage: percentage)
                             .frame(height: 10)
                         
+                        if let variationName = wishesViewModel.wish?.product_id?.variation_name, !variationName.isEmpty {
+                            Text("النوع: \(variationName)")
+                                .customFont(weight: .regular, size: 12)
+                                .foregroundColor(.primary())
+                        }
+
                         Text(wishesViewModel.wish?.product_id?.description ?? "")
                             .customFont(weight: .regular, size: 14)
                             .foregroundColor(.primaryBlack())
@@ -122,11 +128,12 @@ struct MyWishView: View {
                 }
             }
         }
-        .onChange(of: wishesViewModel.errorMessage) { errorMessage in
-            if let errorMessage = errorMessage {
-                appRouter.toggleAppPopup(.alertError("", errorMessage))
-            }
-        }
+        .overlay(
+            MessageAlertObserverView(
+                message: $wishesViewModel.errorMessage,
+                alertType: .constant(.error)
+            )
+        )
         .onAppear {
             laodWishData()
         }

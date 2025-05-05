@@ -75,17 +75,26 @@ struct AddBalanceView: View {
             Alert(title: Text(LocalizedStringKey.error), message: Text(alertMessage), dismissButton: .default(Text(LocalizedStringKey.ok)))
         }
         .onAppear {
-            GoSellSDK.mode = .production
+            GoSellSDK.mode = .sandbox
         }
-        .onChange(of: viewModel.errorMessage) { errorMessage in
-            if !errorMessage.isEmpty {
-                appRouter.toggleAppPopup(.alertError("", errorMessage))
-            }
-        }
-        .onChange(of: viewModel.paymentSuccess) { paymentSuccess in
-            // Do something when payment is successful
-            if paymentSuccess {
+        .overlay(
+            MessageAlertObserverView(
+                message: $viewModel.errorMessage,
+                alertType: .constant(.error)
+            )
+        )
+        .onChange(of: viewModel.paymentStatus) { status in
+            guard let status = status else { return }
+
+            paymentState.isLoading = false
+
+            switch status {
+            case .success:
                 addBalance()
+            case .failed(let message):
+                viewModel.errorMessage = message
+            case .cancelled:
+                viewModel.errorMessage = "تم إلغاء عملية الدفع"
             }
         }
     }

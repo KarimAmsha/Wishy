@@ -52,6 +52,7 @@ struct CheckoutView: View {
     @StateObject private var paymentViewModel = PaymentViewModel()
     @State private var showTamaraPayment = false
     @State private var checkoutUrl = ""
+    @State var tamaraViewModel: TamaraWebViewModel? = nil
 
     @State private var selectedAddress: AddressItem? {
         didSet {
@@ -119,10 +120,12 @@ struct CheckoutView: View {
                     // Place order logic
                     if payCash {
                         addOrder()
-                    } else {
+                    } else if payMada {
                         if let cartTotal = cartViewModel.cartTotal {
                             startPayment(amount: cartTotal.final_total ?? 0.0)
                         }
+                    } else if payTamara {
+                        tamaraCheckout()
                     }
                 }) {
                     HStack {
@@ -178,16 +181,18 @@ struct CheckoutView: View {
                 .isOpaque(true)
                 .useKeyboardSafeArea(true)
         }
-        .onChange(of: orderViewModel.errorMessage) { errorMessage in
-            if let errorMessage = errorMessage {
-                appRouter.toggleAppPopup(.alertError("", errorMessage))
-            }
-        }
-        .onChange(of: cartViewModel.errorMessage) { errorMessage in
-            if let errorMessage = errorMessage {
-                appRouter.toggleAppPopup(.alertError("", errorMessage))
-            }
-        }
+        .overlay(
+            MessageAlertObserverView(
+                message: $orderViewModel.errorMessage,
+                alertType: .constant(.error)
+            )
+        )
+        .overlay(
+            MessageAlertObserverView(
+                message: $cartViewModel.errorMessage,
+                alertType: .constant(.error)
+            )
+        )
         .onChange(of: locationManager2.location) { value in
             if let location = locationManager2.location {
                 print("New Location: \(location)")
@@ -208,64 +213,107 @@ struct CheckoutView: View {
                 )
             }
         }
-        .onChange(of: paymentViewModel.errorMessage) { errorMessage in
-            if !errorMessage.isEmpty {
-                appRouter.toggleAppPopup(.alertError("", errorMessage))
-            }
-        }
-        .onChange(of: orderViewModel.errorMessage) { errorMessage in
-            if let errorMessage = errorMessage {
-                appRouter.toggleAppPopup(.alertError("", errorMessage))
-            }
-        }
-        .onChange(of: paymentViewModel.paymentSuccess) { paymentSuccess in
-            // Do something when payment is successful
-            if paymentSuccess {
+        .overlay(
+            MessageAlertObserverView(
+                message: $paymentViewModel.errorMessage,
+                alertType: .constant(.error)
+            )
+        )
+        .overlay(
+            MessageAlertObserverView(
+                message: $orderViewModel.errorMessage,
+                alertType: .constant(.error)
+            )
+        )
+        .onChange(of: paymentViewModel.paymentStatus) { status in
+            guard let status = status else { return }
+
+            orderViewModel.isLoading = false
+
+            switch status {
+            case .success:
                 addOrder()
+            case .failed(let message):
+                orderViewModel.errorMessage = message
+            case .cancelled:
+                orderViewModel.errorMessage = "تم إلغاء عملية الدفع"
             }
         }
         .fullScreenCover(isPresented: $showTamaraPayment) {
-            let merchantURL = TamaraMerchantURL(
-                success: "tamara://checkout/success",
-                failure: "tamara://checkout/failure",
-                cancel: "tamara://checkout/cancel",
-                notification: "tamara://checkout/notification"
-            )
-
-            let tamaraViewModel = TamaraSDKCheckoutSwiftUIViewModel(
-                url: checkoutUrl,
-                merchantURL: merchantURL
-            )
-
-            VStack {
-                VStack(alignment: .leading) {
+            if let tamaraViewModel = tamaraViewModel {
+                VStack {
                     HStack {
                         Spacer()
-                        Button {
+                        Button(action: {
                             showTamaraPayment = false
-                        } label: {
+                        }) {
                             Image(systemName: "xmark")
-                                .resizable()
-                                .frame(width: 16, height: 16)
-                                .foregroundColor(Color.gray)
-                                .padding(10)
+                                .padding()
                         }
                     }
-                    .padding()
-                    Divider()
-                }
 
-                TamaraSDKCheckoutSwiftUI(tamaraViewModel)
-                    .onReceive(tamaraViewModel.$successDirection) { _ in
-                        showTamaraPayment = false
-                        addOrder()
-                    }
-                    .onReceive(tamaraViewModel.$failedDirection) { _ in
-                        showTamaraPayment = false
-                    }
-                    .onReceive(tamaraViewModel.$finishLoadingHandler) { _ in }
+                    TamaraWebView(viewModel: tamaraViewModel)
+                        .onReceive(tamaraViewModel.$result) { result in
+                            guard let result = result else { return }
+                            showTamaraPayment = false
+                            switch result {
+                            case .success:
+                                addOrder()
+                            case .failure:
+                                orderViewModel.errorMessage = "فشلت عملية الدفع"
+                            case .cancelled:
+                                orderViewModel.errorMessage = "تم إلغاء عملية الدفع"
+                            case .notification:
+                                print("تم استلام إشعار خارجي من تمارا")
+                            }
+                        }
+                }
             }
         }
+
+//        .fullScreenCover(isPresented: $showTamaraPayment) {
+//            let merchantURL = TamaraMerchantURL(
+//                success: "tamara://checkout/success",
+//                failure: "tamara://checkout/failure",
+//                cancel: "tamara://checkout/cancel",
+//                notification: "tamara://checkout/notification"
+//            )
+//
+//            let tamaraViewModel = TamaraSDKCheckoutSwiftUIViewModel(
+//                url: checkoutUrl,
+//                merchantURL: merchantURL
+//            )
+//
+//            VStack {
+//                VStack(alignment: .leading) {
+//                    HStack {
+//                        Spacer()
+//                        Button {
+//                            showTamaraPayment = false
+//                        } label: {
+//                            Image(systemName: "xmark")
+//                                .resizable()
+//                                .frame(width: 16, height: 16)
+//                                .foregroundColor(Color.gray)
+//                                .padding(10)
+//                        }
+//                    }
+//                    .padding()
+//                    Divider()
+//                }
+//
+//                TamaraSDKCheckoutSwiftUI(tamaraViewModel)
+//                    .onReceive(tamaraViewModel.$successDirection) { _ in
+//                        print("uuuu \(self.checkoutUrl)")
+//                        showTamaraPayment = false
+//                        addOrder()
+//                    }
+//                    .onReceive(tamaraViewModel.$failedDirection) { _ in
+//                        showTamaraPayment = false
+//                    }
+//                    .onReceive(tamaraViewModel.$finishLoadingHandler) { _ in }
+//            }
+//        }
         .onAppear {
             userViewModel.getAddressByType(type: servicePlace.rawValue)
             cartViewModel.cartTotal {
@@ -274,7 +322,7 @@ struct CheckoutView: View {
             cartViewModel.getCartItems()
             locationManager2.startUpdatingLocation()
             
-            GoSellSDK.mode = .production
+            GoSellSDK.mode = .sandbox
         }
     }
 }
@@ -584,24 +632,17 @@ struct AddressSelectionView: View {
 
 extension CheckoutView {
     func addOrder() {
-        if selectedPurchaseType == .myself {
-            // Check if the selected address is valid based on the purchase type
-            guard let selectedAddress = selectedAddress else {
-                orderViewModel.errorMessage = "الرجاء اختيار عنوان"
-                return
-            }
-
-            // Validate latitude and longitude for "myself" purchase type
-            if selectedAddress.lat == 0.0 || selectedAddress.lng == 0.0 {
-                orderViewModel.errorMessage = "الرجاء اختيار عنوان"
-                return
-            }
-        } else {
-            // Validate address ID for other purchase types
-            if region.center.latitude == 0.0 || region.center.longitude == 0.0 {
-                orderViewModel.errorMessage = "الرجاء اختيار عنوان"
-                return
-            }
+        let validation = validateAddress(purchaseType: selectedPurchaseType, selectedAddress: selectedAddress, region: region)
+        
+        switch validation {
+        case .valid:
+            break // نتابع
+        case .missing:
+            orderViewModel.errorMessage = "الرجاء اختيار عنوان"
+            return
+        case .invalidCoordinates:
+            orderViewModel.errorMessage = "العنوان غير صالح"
+            return
         }
 
         let currentDate = Date()
@@ -777,6 +818,20 @@ struct NotesView: View {
 
 extension CheckoutView {
     func startPayment(amount: Double) {
+        let validation = validateAddress(purchaseType: selectedPurchaseType, selectedAddress: selectedAddress, region: region)
+        
+        switch validation {
+        case .valid:
+            break // نتابع
+        case .missing:
+            orderViewModel.errorMessage = "الرجاء اختيار عنوان"
+            return
+        case .invalidCoordinates:
+            orderViewModel.errorMessage = "العنوان غير صالح"
+            return
+        }
+
+        orderViewModel.isLoading = true
         paymentViewModel.updateAmount(amount.toString())
         paymentViewModel.startPayment()
     }
@@ -784,21 +839,17 @@ extension CheckoutView {
 
 extension CheckoutView {
     func tamaraCheckout() {
-        if selectedPurchaseType == .myself {
-            guard let selectedAddress = selectedAddress else {
-                orderViewModel.errorMessage = "الرجاء اختيار عنوان"
-                return
-            }
-
-            if selectedAddress.lat == 0.0 || selectedAddress.lng == 0.0 {
-                orderViewModel.errorMessage = "الرجاء اختيار عنوان"
-                return
-            }
-        } else {
-            if region.center.latitude == 0.0 || region.center.longitude == 0.0 {
-                orderViewModel.errorMessage = "الرجاء اختيار عنوان"
-                return
-            }
+        let validation = validateAddress(purchaseType: selectedPurchaseType, selectedAddress: selectedAddress, region: region)
+        
+        switch validation {
+        case .valid:
+            break // نتابع
+        case .missing:
+            orderViewModel.errorMessage = "الرجاء اختيار عنوان"
+            return
+        case .invalidCoordinates:
+            orderViewModel.errorMessage = "العنوان غير صالح"
+            return
         }
 
         guard let cartTotal = cartViewModel.cartTotal,
@@ -807,6 +858,7 @@ extension CheckoutView {
             return
         }
 
+        orderViewModel.isLoading = true
         let products = cartItems.map {
             TamaraProduct(
                 product_id: $0.id ?? "",
@@ -822,8 +874,44 @@ extension CheckoutView {
         )
 
         orderViewModel.tamaraCheckout(params: tamaraBody) {
-            self.checkoutUrl = orderViewModel.tamaraCheckout?.checkout_url ?? ""
+            let url = orderViewModel.tamaraCheckout?.checkout_url ?? ""
+            self.checkoutUrl = url
+
+            // Initialize the Tamara view model with the new URL and merchantURL
+            self.tamaraViewModel = TamaraWebViewModel(
+                url: self.checkoutUrl,
+                merchantURL: TamaraMerchantURL(
+                    success: "tamara://checkout/success",
+                    failure: "tamara://checkout/failure",
+                    cancel: "tamara://checkout/cancel",
+                    notification: "tamara://checkout/notification"
+                )
+            )
+
             showTamaraPayment.toggle()
         }
     }
+}
+
+extension CheckoutView {
+    func validateAddress(purchaseType: PurchaseType, selectedAddress: AddressItem?, region: MKCoordinateRegion) -> AddressValidationResult {
+        switch purchaseType {
+        case .myself:
+            guard let address = selectedAddress else { return .missing }
+            if address.lat == 0.0 || address.lng == 0.0 {
+                return .invalidCoordinates
+            }
+        case .friend:
+            if region.center.latitude == 0.0 || region.center.longitude == 0.0 {
+                return .invalidCoordinates
+            }
+        }
+        return .valid
+    }
+}
+
+enum AddressValidationResult {
+    case valid
+    case missing
+    case invalidCoordinates
 }

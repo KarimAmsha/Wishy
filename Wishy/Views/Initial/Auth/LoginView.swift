@@ -129,9 +129,12 @@ struct LoginView: View {
 //            mobile = "905345719207"
 //            #endif
         }
-//        .overlay(
-//            ErrorObserverView(errorMessage: $viewModel.errorMessage)
-//        )
+        .overlay(
+            MessageAlertObserverView(
+                message: $viewModel.errorMessage,
+                alertType: .constant(.error)
+            )
+        )
     }
     
     private func getCompletePhoneNumber() -> String {

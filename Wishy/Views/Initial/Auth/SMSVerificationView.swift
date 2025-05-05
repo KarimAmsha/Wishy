@@ -110,11 +110,12 @@ struct SMSVerificationView: View {
                 }
             }
         }
-        .onChange(of: viewModel.errorMessage) { errorMessage in
-            if let errorMessage = errorMessage {
-                appRouter.toggleAppPopup(.alertError(LocalizedStringKey.error, errorMessage))
-            }
-        }
+        .overlay(
+            MessageAlertObserverView(
+                message: $viewModel.errorMessage,
+                alertType: .constant(.error)
+            )
+        )
     }
     
     private func formattedTime(minutes: Int, seconds: Int) -> String {

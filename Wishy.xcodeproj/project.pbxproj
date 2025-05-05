@@ -234,6 +234,11 @@
 		1EFB9B352C1C4CFE00C15CE4 /* VIPGiftView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EFB9B342C1C4CFE00C15CE4 /* VIPGiftView.swift */; };
 		1EFB9B372C1C624B00C15CE4 /* EventListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EFB9B362C1C624B00C15CE4 /* EventListView.swift */; };
 		529EC5042DC8B8F0009AB1FF /* ErrorObserverView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 529EC5032DC8B8EF009AB1FF /* ErrorObserverView.swift */; };
+		529EC5062DC8C0AA009AB1FF /* PopupObserverView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 529EC5052DC8C0A9009AB1FF /* PopupObserverView.swift */; };
+		529EC5082DC8C1F2009AB1FF /* MessageStatusObserverView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 529EC5072DC8C1F1009AB1FF /* MessageStatusObserverView.swift */; };
+		529EC50A2DC8C93D009AB1FF /* Binding+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 529EC5092DC8C929009AB1FF /* Binding+Extension.swift */; };
+		529EC50C2DC90304009AB1FF /* TamaraWebViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 529EC50B2DC90302009AB1FF /* TamaraWebViewModel.swift */; };
+		529EC50E2DC9031A009AB1FF /* TamaraWebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 529EC50D2DC90318009AB1FF /* TamaraWebView.swift */; };
 		52F03F922DC1448F00D11215 /* TamaraProduct.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52F03F912DC1448E00D11215 /* TamaraProduct.swift */; };
 		EBD3E74A720BEA314F0148F5 /* Pods_Wishy.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4B667FA6DBD96FEFF3FAA6B5 /* Pods_Wishy.framework */; };
 /* End PBXBuildFile section */
@@ -441,6 +446,11 @@
 		31C7D776385A8677660C14E6 /* Pods-Wishy.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Wishy.release.xcconfig"; path = "Target Support Files/Pods-Wishy/Pods-Wishy.release.xcconfig"; sourceTree = "<group>"; };
 		4B667FA6DBD96FEFF3FAA6B5 /* Pods_Wishy.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Wishy.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		529EC5032DC8B8EF009AB1FF /* ErrorObserverView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorObserverView.swift; sourceTree = "<group>"; };
+		529EC5052DC8C0A9009AB1FF /* PopupObserverView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PopupObserverView.swift; sourceTree = "<group>"; };
+		529EC5072DC8C1F1009AB1FF /* MessageStatusObserverView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageStatusObserverView.swift; sourceTree = "<group>"; };
+		529EC5092DC8C929009AB1FF /* Binding+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Binding+Extension.swift"; sourceTree = "<group>"; };
+		529EC50B2DC90302009AB1FF /* TamaraWebViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TamaraWebViewModel.swift; sourceTree = "<group>"; };
+		529EC50D2DC90318009AB1FF /* TamaraWebView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TamaraWebView.swift; sourceTree = "<group>"; };
 		52F03F912DC1448E00D11215 /* TamaraProduct.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TamaraProduct.swift; sourceTree = "<group>"; };
 		B5A6968E8E0A25FFA94E4E57 /* Pods-Wishy.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Wishy.debug.xcconfig"; path = "Target Support Files/Pods-Wishy/Pods-Wishy.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -600,6 +610,7 @@
 		1ECC944B2BDC56DE002BFE54 /* ViewModels */ = {
 			isa = PBXGroup;
 			children = (
+				529EC50B2DC90302009AB1FF /* TamaraWebViewModel.swift */,
 				1E28042F2C04D41A0021DFB0 /* NotificationsViewModel.swift */,
 				1ECC94EF2BDD11D4002BFE54 /* LanguageManager.swift */,
 				1ECC94F12BDD1215002BFE54 /* AppRouter.swift */,
@@ -719,6 +730,9 @@
 		1ECC94522BDC579E002BFE54 /* Modifiers+Styles+UIViewControllerRepresentable */ = {
 			isa = PBXGroup;
 			children = (
+				529EC50D2DC90318009AB1FF /* TamaraWebView.swift */,
+				529EC5072DC8C1F1009AB1FF /* MessageStatusObserverView.swift */,
+				529EC5052DC8C0A9009AB1FF /* PopupObserverView.swift */,
 				529EC5032DC8B8EF009AB1FF /* ErrorObserverView.swift */,
 				1ECC94C72BDC5E49002BFE54 /* APIErrorHandling.swift */,
 				1ECC94C52BDC5E49002BFE54 /* AsyncImageView.swift */,
@@ -763,6 +777,7 @@
 		1ECC94592BDC5AA5002BFE54 /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
+				529EC5092DC8C929009AB1FF /* Binding+Extension.swift */,
 				1ECC945A2BDC5B67002BFE54 /* Bundle+Extensions.swift */,
 				1ECC94642BDC5B68002BFE54 /* Color+Extensions.swift */,
 				1ECC94632BDC5B68002BFE54 /* Date+Extensions.swift */,
@@ -1165,6 +1180,7 @@
 				1EFB9B2C2C1BA94300C15CE4 /* UserProductsView.swift in Sources */,
 				1E5F31912BE2414B00E5A914 /* RetailPaymentView.swift in Sources */,
 				1ECC952F2BDD75E7002BFE54 /* MobileView.swift in Sources */,
+				529EC5082DC8C1F2009AB1FF /* MessageStatusObserverView.swift in Sources */,
 				1ECC94D42BDC5E49002BFE54 /* APIErrorHandling.swift in Sources */,
 				1EFB9B252C1B975D00C15CE4 /* Reminder.swift in Sources */,
 				1EA6D31F2C1DB0D2007E8AE0 /* WalletView.swift in Sources */,
@@ -1249,6 +1265,7 @@
 				1EC27FEA2C0375390007279D /* Cart.swift in Sources */,
 				1EA7FEEB2C19EB8000823465 /* AddGroupView.swift in Sources */,
 				529EC5042DC8B8F0009AB1FF /* ErrorObserverView.swift in Sources */,
+				529EC5062DC8C0AA009AB1FF /* PopupObserverView.swift in Sources */,
 				1E28043C2C04FE160021DFB0 /* CheckoutView.swift in Sources */,
 				1ECC95442BDDAC4A002BFE54 /* HomeView.swift in Sources */,
 				1EDEF66F2BE1747A00863C10 /* EditProfileView.swift in Sources */,
@@ -1262,6 +1279,7 @@
 				1EA6D32D2C1DB39C007E8AE0 /* Coupon.swift in Sources */,
 				1E2804442C067E4E0021DFB0 /* ProductsSearchView.swift in Sources */,
 				1ECC94E82BDC6A1A002BFE54 /* ControlDots.swift in Sources */,
+				529EC50C2DC90304009AB1FF /* TamaraWebViewModel.swift in Sources */,
 				1E60849A2BE0037A007D83B1 /* SearchBar.swift in Sources */,
 				1EA7FEF12C1A1C7300823465 /* AddFriendView.swift in Sources */,
 				1E1EDA762C1CAF86003047CA /* AddVIP.swift in Sources */,
@@ -1277,10 +1295,12 @@
 				1E1EDA7A2C1CCF12003047CA /* RetailAlertView.swift in Sources */,
 				1ECC95022BDD147D002BFE54 /* APIResponse.swift in Sources */,
 				1EFB9B212C1B7B4200C15CE4 /* Wish.swift in Sources */,
+				529EC50A2DC8C93D009AB1FF /* Binding+Extension.swift in Sources */,
 				1EFB9B302C1C349800C15CE4 /* ImagePicker2.swift in Sources */,
 				1ECC94CD2BDC5E49002BFE54 /* ImagePicker.swift in Sources */,
 				1ECC94EC2BDC6A8C002BFE54 /* WelcomeItem.swift in Sources */,
 				1E2804192C04C6700021DFB0 /* AddressBookView.swift in Sources */,
+				529EC50E2DC9031A009AB1FF /* TamaraWebView.swift in Sources */,
 				1E28042D2C04D3F30021DFB0 /* NotificationsView.swift in Sources */,
 				1E2804232C04C7C70021DFB0 /* Complain.swift in Sources */,
 				1E28041B2C04C6700021DFB0 /* EditAddressView.swift in Sources */,

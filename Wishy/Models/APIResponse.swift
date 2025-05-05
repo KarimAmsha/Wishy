@@ -187,5 +187,9 @@ struct TamaraCheckoutResponse: Codable {
 }
 
 struct TamaraCheckoutData: Codable {
+    let order_id: String?
+    let checkout_id: String?
     let checkout_url: String?
+    let status: String?
+    let orderNo: String?
 }

@@ -52,7 +52,7 @@ struct RegisterView: View {
                         Button {
                             Messaging.messaging().token { token, error in
                                 if let error = error {
-                                    appRouter.activePopupError = .alertError(LocalizedStringKey.error, error.localizedDescription)
+                                    appRouter.toggleAppPopup(.alertError(LocalizedStringKey.error, error.localizedDescription))
                                 } else if let token = token {
                                     register(fcmToken: token)
                                 }

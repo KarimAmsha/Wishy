@@ -198,16 +198,14 @@ struct MainView: View {
                 get: { appRouter.appPopup != nil },
                 set: { _ in appRouter.toggleAppPopup(nil) })
             ) {
-                Group {
-                    if let popup = appRouter.appPopup {
-                        switch popup {
-                        case .alertError(let title, let message):
-                            GeneralAlertToastView(title: title, message: message, type: .error)
-                        case .alertSuccess(let title, let message):
-                            GeneralAlertToastView(title: title, message: message, type: .success)
-                        case .alertInfo(let title, let message):
-                            GeneralAlertToastView(title: title, message: message, type: .info)
-                        }
+                if let popup = appRouter.appPopup {
+                    switch popup {
+                    case .alertError(let title, let message):
+                        GeneralAlertToastView(title: title, message: message, type: .error)
+                    case .alertSuccess(let title, let message):
+                        GeneralAlertToastView(title: title, message: message, type: .success)
+                    case .alertInfo(let title, let message):
+                        GeneralAlertToastView(title: title, message: message, type: .info)
                     }
                 }
             } customize: {

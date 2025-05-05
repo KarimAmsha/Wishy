@@ -95,7 +95,7 @@ struct WelcomeView: View {
                 }
                 .popup(isPresented: Binding<Bool>(
                     get: { appRouter.appPopup != nil },
-                    set: { _ in appRouter.togglePopupError(nil) })
+                    set: { _ in appRouter.toggleAppPopup(nil) })
                 ) {
                    if let popup = appRouter.appPopup {
                        switch popup {

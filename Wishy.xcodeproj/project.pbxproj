@@ -233,6 +233,7 @@
 		1EFB9B322C1C40B900C15CE4 /* AddUserProduct.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EFB9B312C1C40B900C15CE4 /* AddUserProduct.swift */; };
 		1EFB9B352C1C4CFE00C15CE4 /* VIPGiftView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EFB9B342C1C4CFE00C15CE4 /* VIPGiftView.swift */; };
 		1EFB9B372C1C624B00C15CE4 /* EventListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EFB9B362C1C624B00C15CE4 /* EventListView.swift */; };
+		529EC5042DC8B8F0009AB1FF /* ErrorObserverView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 529EC5032DC8B8EF009AB1FF /* ErrorObserverView.swift */; };
 		52F03F922DC1448F00D11215 /* TamaraProduct.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52F03F912DC1448E00D11215 /* TamaraProduct.swift */; };
 		EBD3E74A720BEA314F0148F5 /* Pods_Wishy.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4B667FA6DBD96FEFF3FAA6B5 /* Pods_Wishy.framework */; };
 /* End PBXBuildFile section */
@@ -439,6 +440,7 @@
 		1EFB9B362C1C624B00C15CE4 /* EventListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventListView.swift; sourceTree = "<group>"; };
 		31C7D776385A8677660C14E6 /* Pods-Wishy.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Wishy.release.xcconfig"; path = "Target Support Files/Pods-Wishy/Pods-Wishy.release.xcconfig"; sourceTree = "<group>"; };
 		4B667FA6DBD96FEFF3FAA6B5 /* Pods_Wishy.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Wishy.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		529EC5032DC8B8EF009AB1FF /* ErrorObserverView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorObserverView.swift; sourceTree = "<group>"; };
 		52F03F912DC1448E00D11215 /* TamaraProduct.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TamaraProduct.swift; sourceTree = "<group>"; };
 		B5A6968E8E0A25FFA94E4E57 /* Pods-Wishy.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Wishy.debug.xcconfig"; path = "Target Support Files/Pods-Wishy/Pods-Wishy.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -717,6 +719,7 @@
 		1ECC94522BDC579E002BFE54 /* Modifiers+Styles+UIViewControllerRepresentable */ = {
 			isa = PBXGroup;
 			children = (
+				529EC5032DC8B8EF009AB1FF /* ErrorObserverView.swift */,
 				1ECC94C72BDC5E49002BFE54 /* APIErrorHandling.swift */,
 				1ECC94C52BDC5E49002BFE54 /* AsyncImageView.swift */,
 				1ECC94C22BDC5E49002BFE54 /* ButtonsStyles.swift */,
@@ -1245,6 +1248,7 @@
 				1ECC94D02BDC5E49002BFE54 /* OtpModifer.swift in Sources */,
 				1EC27FEA2C0375390007279D /* Cart.swift in Sources */,
 				1EA7FEEB2C19EB8000823465 /* AddGroupView.swift in Sources */,
+				529EC5042DC8B8F0009AB1FF /* ErrorObserverView.swift in Sources */,
 				1E28043C2C04FE160021DFB0 /* CheckoutView.swift in Sources */,
 				1ECC95442BDDAC4A002BFE54 /* HomeView.swift in Sources */,
 				1EDEF66F2BE1747A00863C10 /* EditProfileView.swift in Sources */,

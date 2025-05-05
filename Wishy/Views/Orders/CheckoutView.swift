@@ -239,37 +239,58 @@ struct CheckoutView: View {
                 orderViewModel.errorMessage = "تم إلغاء عملية الدفع"
             }
         }
+//        .fullScreenCover(isPresented: $showTamaraPayment) {
+//            if let tamaraViewModel = tamaraViewModel {
+//                VStack {
+//                    HStack {
+//                        Spacer()
+//                        Button(action: {
+//                            showTamaraPayment = false
+//                        }) {
+//                            Image(systemName: "xmark")
+//                                .padding()
+//                        }
+//                    }
+//
+//                    TamaraWebView(viewModel: tamaraViewModel)
+//                        .onReceive(tamaraViewModel.$result) { result in
+//                            guard let result = result else { return }
+//                            orderViewModel.isLoading = false
+//                            showTamaraPayment = false
+//                            
+//                            switch result {
+//                            case .success:
+//                                addOrder()
+//                            case .failure:
+//                                orderViewModel.errorMessage = "فشلت عملية الدفع"
+//                            case .cancelled:
+//                                orderViewModel.errorMessage = "تم إلغاء عملية الدفع"
+//                            case .notification:
+//                                print("تم استلام إشعار خارجي من تمارا")
+//                            }
+//                        }
+//                }
+//            }
+//        }
         .fullScreenCover(isPresented: $showTamaraPayment) {
-            if let tamaraViewModel = tamaraViewModel {
-                VStack {
-                    HStack {
-                        Spacer()
-                        Button(action: {
-                            showTamaraPayment = false
-                        }) {
-                            Image(systemName: "xmark")
-                                .padding()
-                        }
-                    }
+            if let url = URL(string: checkoutUrl) {
+                SafariView(url: url) { redirectedURL in
+                    let urlStr = redirectedURL.absoluteString
 
-                    TamaraWebView(viewModel: tamaraViewModel)
-                        .onReceive(tamaraViewModel.$result) { result in
-                            guard let result = result else { return }
-                            showTamaraPayment = false
-                            switch result {
-                            case .success:
-                                addOrder()
-                            case .failure:
-                                orderViewModel.errorMessage = "فشلت عملية الدفع"
-                            case .cancelled:
-                                orderViewModel.errorMessage = "تم إلغاء عملية الدفع"
-                            case .notification:
-                                print("تم استلام إشعار خارجي من تمارا")
-                            }
-                        }
+                    if urlStr.contains("wishy.sa/tamara/success") {
+                        showTamaraPayment = false
+                        addOrder()
+                    } else if urlStr.contains("wishy.sa/tamara/failure") {
+                        showTamaraPayment = false
+                        orderViewModel.errorMessage = "فشلت عملية الدفع"
+                    } else if urlStr.contains("wishy.sa/tamara/cancel") {
+                        showTamaraPayment = false
+                        orderViewModel.errorMessage = "تم إلغاء عملية الدفع"
+                    }
                 }
             }
         }
+
 
 //        .fullScreenCover(isPresented: $showTamaraPayment) {
 //            let merchantURL = TamaraMerchantURL(
@@ -881,10 +902,10 @@ extension CheckoutView {
             self.tamaraViewModel = TamaraWebViewModel(
                 url: self.checkoutUrl,
                 merchantURL: TamaraMerchantURL(
-                    success: "tamara://checkout/success",
-                    failure: "tamara://checkout/failure",
-                    cancel: "tamara://checkout/cancel",
-                    notification: "tamara://checkout/notification"
+                    success: "https://wishy.sa/tamara/success",
+                    failure: "https://wishy.sa/tamara/failure",
+                    cancel: "https://wishy.sa/tamara/cancel",
+                    notification: "https://wishy.sa/tamara/cancel"
                 )
             )
 

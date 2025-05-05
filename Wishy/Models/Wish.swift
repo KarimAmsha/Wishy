@@ -20,7 +20,9 @@ struct Wish: Codable, Hashable {
     let pays: [Pay]?
     let createAt: String?
     let finishAt: String?
-    
+    let variation_name: String?
+    let variation_sku: String?
+
     enum CodingKeys: String, CodingKey {
         case isComplete
         case id = "_id"
@@ -34,6 +36,8 @@ struct Wish: Codable, Hashable {
         case pays
         case createAt
         case finishAt
+        case variation_name
+        case variation_sku
     }
 
     var formattedCreateDate: String? {

@@ -19,10 +19,12 @@ struct TamaraWebView: UIViewRepresentable {
         let webView = viewModel.webView
         webView.navigationDelegate = context.coordinator
         webView.scrollView.bounces = false
+
         if let requestURL = URL(string: viewModel.url) {
             let request = URLRequest(url: requestURL)
             webView.load(request)
         }
+
         return webView
     }
 
@@ -37,41 +39,59 @@ struct TamaraWebView: UIViewRepresentable {
 
         func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
             viewModel.isLoading = false
-        }
 
-        func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
-            guard let url = navigationAction.request.url else {
-                decisionHandler(.allow)
-                return
+            guard let currentURL = webView.url?.absoluteString else { return }
+            print("FINISHED: \(currentURL)")
+
+            webView.evaluateJavaScript("window.location.href") { (result, error) in
+                if let urlString = result as? String {
+                    print("Evaluated JS URL: \(urlString)")
+                }
             }
 
-            let urlStr = url.absoluteString
-
-            if urlStr.starts(with: viewModel.merchantURL.success) {
+            if currentURL.contains("wishy.sa/tamara/success") {
                 viewModel.result = .success
-                decisionHandler(.cancel)
-                return
-            }
-
-            if urlStr.starts(with: viewModel.merchantURL.failure) {
+            } else if currentURL.contains("wishy.sa/tamara/failure") {
                 viewModel.result = .failure
-                decisionHandler(.cancel)
-                return
-            }
-
-            if urlStr.starts(with: viewModel.merchantURL.cancel) {
+            } else if currentURL.contains("wishy.sa/tamara/cancel") {
                 viewModel.result = .cancelled
-                decisionHandler(.cancel)
-                return
             }
-
-            if urlStr.starts(with: viewModel.merchantURL.notification) {
-                viewModel.result = .notification
-                decisionHandler(.cancel)
-                return
-            }
-
-            decisionHandler(.allow)
         }
+
+//        func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
+//            guard let url = navigationAction.request.url else {
+//                decisionHandler(.allow)
+//                return
+//            }
+//
+//            let urlStr = url.absoluteString
+//            print("Navigated to: \(urlStr)")
+//
+//            if urlStr.contains(viewModel.merchantURL.success) {
+//                viewModel.result = .success
+//                decisionHandler(.cancel)
+//                return
+//            }
+//
+//            if urlStr.contains(viewModel.merchantURL.failure) {
+//                viewModel.result = .failure
+//                decisionHandler(.cancel)
+//                return
+//            }
+//
+//            if urlStr.contains(viewModel.merchantURL.cancel) {
+//                viewModel.result = .cancelled
+//                decisionHandler(.cancel)
+//                return
+//            }
+//
+//            if urlStr.contains(viewModel.merchantURL.notification) {
+//                viewModel.result = .notification
+//                decisionHandler(.cancel)
+//                return
+//            }
+//
+//            decisionHandler(.allow)
+//        }
     }
 }

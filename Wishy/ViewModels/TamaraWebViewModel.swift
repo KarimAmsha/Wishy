@@ -16,20 +16,19 @@ struct TamaraMerchantURL {
     let notification: String
 }
 
+enum TamaraWebResult {
+    case success
+    case failure
+    case cancelled
+    case notification
+}
+
 class TamaraWebViewModel: ObservableObject {
-    @Published var webView = WKWebView()
     @Published var url: String
+    @Published var result: TamaraWebResult?
     @Published var isLoading: Bool = true
-    @Published var result: ResultType? = nil
-
     let merchantURL: TamaraMerchantURL
-
-    enum ResultType {
-        case success
-        case failure
-        case cancelled
-        case notification
-    }
+    let webView: WKWebView
 
     init(url: String, merchantURL: TamaraMerchantURL) {
         self.url = url
@@ -37,6 +36,8 @@ class TamaraWebViewModel: ObservableObject {
 
         let config = WKWebViewConfiguration()
         config.preferences.javaScriptEnabled = true
+        config.allowsInlineMediaPlayback = true
+        config.mediaTypesRequiringUserActionForPlayback = []
         self.webView = WKWebView(frame: .zero, configuration: config)
     }
 }

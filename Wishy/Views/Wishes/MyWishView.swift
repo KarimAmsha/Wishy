@@ -75,7 +75,7 @@ struct MyWishView: View {
                         ProgressLineView(percentage: percentage)
                             .frame(height: 10)
                         
-                        if let variationName = wishesViewModel.wish?.product_id?.variation_name, !variationName.isEmpty {
+                        if let variationName = wishesViewModel.wish?.variation_name, !variationName.isEmpty {
                             Text("النوع: \(variationName)")
                                 .customFont(weight: .regular, size: 12)
                                 .foregroundColor(.primary())

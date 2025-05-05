@@ -233,6 +233,7 @@
 		1EFB9B322C1C40B900C15CE4 /* AddUserProduct.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EFB9B312C1C40B900C15CE4 /* AddUserProduct.swift */; };
 		1EFB9B352C1C4CFE00C15CE4 /* VIPGiftView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EFB9B342C1C4CFE00C15CE4 /* VIPGiftView.swift */; };
 		1EFB9B372C1C624B00C15CE4 /* EventListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EFB9B362C1C624B00C15CE4 /* EventListView.swift */; };
+		520BB0382DC959AC00DB6315 /* SafariView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 520BB0372DC959AB00DB6315 /* SafariView.swift */; };
 		529EC5042DC8B8F0009AB1FF /* ErrorObserverView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 529EC5032DC8B8EF009AB1FF /* ErrorObserverView.swift */; };
 		529EC5062DC8C0AA009AB1FF /* PopupObserverView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 529EC5052DC8C0A9009AB1FF /* PopupObserverView.swift */; };
 		529EC5082DC8C1F2009AB1FF /* MessageStatusObserverView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 529EC5072DC8C1F1009AB1FF /* MessageStatusObserverView.swift */; };
@@ -445,6 +446,7 @@
 		1EFB9B362C1C624B00C15CE4 /* EventListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventListView.swift; sourceTree = "<group>"; };
 		31C7D776385A8677660C14E6 /* Pods-Wishy.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Wishy.release.xcconfig"; path = "Target Support Files/Pods-Wishy/Pods-Wishy.release.xcconfig"; sourceTree = "<group>"; };
 		4B667FA6DBD96FEFF3FAA6B5 /* Pods_Wishy.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Wishy.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		520BB0372DC959AB00DB6315 /* SafariView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SafariView.swift; sourceTree = "<group>"; };
 		529EC5032DC8B8EF009AB1FF /* ErrorObserverView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorObserverView.swift; sourceTree = "<group>"; };
 		529EC5052DC8C0A9009AB1FF /* PopupObserverView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PopupObserverView.swift; sourceTree = "<group>"; };
 		529EC5072DC8C1F1009AB1FF /* MessageStatusObserverView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageStatusObserverView.swift; sourceTree = "<group>"; };
@@ -730,6 +732,7 @@
 		1ECC94522BDC579E002BFE54 /* Modifiers+Styles+UIViewControllerRepresentable */ = {
 			isa = PBXGroup;
 			children = (
+				520BB0372DC959AB00DB6315 /* SafariView.swift */,
 				529EC50D2DC90318009AB1FF /* TamaraWebView.swift */,
 				529EC5072DC8C1F1009AB1FF /* MessageStatusObserverView.swift */,
 				529EC5052DC8C0A9009AB1FF /* PopupObserverView.swift */,
@@ -1287,6 +1290,7 @@
 				1ECC94682BDC5B68002BFE54 /* Bundle+Extensions.swift in Sources */,
 				1E8E6F122C174E4F003BA912 /* Group.swift in Sources */,
 				1E2804272C04CD320021DFB0 /* Image+Extensions.swift in Sources */,
+				520BB0382DC959AC00DB6315 /* SafariView.swift in Sources */,
 				1ECC95042BDD14A0002BFE54 /* Pagination.swift in Sources */,
 				1ECC95072BDD1587002BFE54 /* AuthenticationView.swift in Sources */,
 				1ECC947A2BDC5B8B002BFE54 /* Enum.swift in Sources */,

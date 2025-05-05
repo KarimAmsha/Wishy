@@ -95,6 +95,12 @@ struct RetailPaymentView: View {
         }
         .overlay(
             MessageAlertObserverView(
+                message: $orderViewModel.errorMessage,
+                alertType: .constant(.error)
+            )
+        )
+        .overlay(
+            MessageAlertObserverView(
                 message: $wishesViewModel.errorMessage,
                 alertType: .constant(.error)
             )
@@ -135,7 +141,9 @@ struct RetailPaymentView: View {
                     TamaraWebView(viewModel: tamaraViewModel)
                         .onReceive(tamaraViewModel.$result) { result in
                             guard let result = result else { return }
+                            orderViewModel.isLoading = false
                             showTamaraPayment = false
+                            
                             switch result {
                             case .success:
                                 payWish()
@@ -207,11 +215,13 @@ struct RetailPaymentView: View {
     }
 
     func startPayment(amount: Double) {
+        orderViewModel.isLoading = true
         paymentViewModel.updateAmount(amount.toString())
         paymentViewModel.startPayment()
     }
 
     func startTamaraCheckout(amount: Double) {
+        orderViewModel.isLoading = true
         let tamaraBody = TamaraBody(
             amount: amount,
             products: [
@@ -223,7 +233,7 @@ struct RetailPaymentView: View {
                 )
             ]
         )
-        
+
         orderViewModel.tamaraCheckout(params: tamaraBody) {
             let url = orderViewModel.tamaraCheckout?.checkout_url ?? ""
             self.checkoutUrl = url
@@ -232,10 +242,10 @@ struct RetailPaymentView: View {
             self.tamaraViewModel = TamaraWebViewModel(
                 url: self.checkoutUrl,
                 merchantURL: TamaraMerchantURL(
-                    success: "tamara://checkout/success",
-                    failure: "tamara://checkout/failure",
-                    cancel: "tamara://checkout/cancel",
-                    notification: "tamara://checkout/notification"
+                    success: "https://wishy.sa/tamara/success",
+                    failure: "https://wishy.sa/tamara/failure",
+                    cancel: "https://wishy.sa/tamara/cancel",
+                    notification: "https://wishy.sa/tamara/cancel"
                 )
             )
 

@@ -1,18 +1,16 @@
-//
-//  FullMapView.swift
-//  Wishy
-//
-//  Created by Karim Amsha on 27.05.2024.
-//
-
 import SwiftUI
 import MapKit
+import Combine
 
 struct FullMapView: View {
     @Binding var region: MKCoordinateRegion
     @State private var locations: [Mark] = []
     @Binding var isShowingMap: Bool
     @Binding var address: String
+
+    // Combine support
+    @State private var regionPublisher = PassthroughSubject<MKCoordinateRegion, Never>()
+    @State private var cancellable: AnyCancellable?
 
     var body: some View {
         NavigationView {
@@ -22,29 +20,30 @@ struct FullMapView: View {
                         coordinate: location.coordinate,
                         anchorPoint: CGPoint(x: 0.5, y: 0.7)
                     ) {
-                        VStack{
+                        VStack {
                             if location.show {
                                 Text(location.title)
                                     .customFont(weight: .bold, size: 14)
                                     .foregroundColor(.black131313())
                             }
-                            
+
                             Image(location.imageName)
                                 .font(.title)
                                 .foregroundColor(.red)
                                 .onTapGesture {
-                                    let index: Int = locations.firstIndex(where: {$0.id == location.id})!
-                                    locations[index].show.toggle()
+                                    if let index = locations.firstIndex(where: { $0.id == location.id }) {
+                                        locations[index].show.toggle()
+                                    }
                                 }
                         }
                     }
                 }
-                
+
                 Image("ic_pin")
                     .resizable()
                     .frame(width: 32, height: 32)
                     .clipShape(Circle())
-                
+
                 VStack {
                     Spacer()
                     Text(address)
@@ -62,15 +61,25 @@ struct FullMapView: View {
             .foregroundColor(.black)
             .onAppear {
                 moveToUserLocation()
+
+                // Combine setup for debounce
+                cancellable = regionPublisher
+                    .debounce(for: .seconds(1.5), scheduler: RunLoop.main)
+                    .sink { newRegion in
+                        Utilities.getAddress(for: newRegion.center) { newAddress in
+                            self.address = newAddress
+                        }
+                    }
             }
-            .onChange(of: region, perform: { newRegion in
-                Utilities.getAddress(for: newRegion.center) { address in
-                    self.address = address
-                }
-            })
+            .onDisappear {
+                cancellable?.cancel()
+            }
+            .onChange(of: region) { newRegion in
+                regionPublisher.send(newRegion)
+            }
         }
     }
-    
+
     func moveToUserLocation() {
         withAnimation(.easeInOut(duration: 2.0)) {
             if let userLocation = LocationManager.shared.userLocation {

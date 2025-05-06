@@ -138,7 +138,7 @@ struct ProductDetailsView: View {
 
                 Button {
                     if let attributes = viewModel.product?.attributes, !attributes.isEmpty, selectedSku.isEmpty {
-                        appRouter.toggleAppPopup(.alertError("", "يرجى اختيار نوع المنتج قبل إضافته إلى امنياتي."))
+                        appRouter.toggleAppPopup(.alertError("", "يرجى اختيار نوع المنتج قبل إضافته إلى امنياتك."))
                         return
                     }
 

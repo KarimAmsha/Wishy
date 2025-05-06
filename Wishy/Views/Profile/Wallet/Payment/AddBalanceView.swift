@@ -27,10 +27,6 @@ struct AddBalanceView: View {
 
     var body: some View {
         VStack(spacing: 20) {
-            
-//            CustomTextFieldWithTitle(text: $coupon, placeholder: LocalizedStringKey.coupon, textColor: .black4E5556(), placeholderColor: .grayA4ACAD())
-//                .disabled(paymentState.isLoading)
-            
             CustomTextFieldWithTitle(text: $amount, placeholder: LocalizedStringKey.amount, textColor: .black4E5556(), placeholderColor: .grayA4ACAD())
                 .keyboardType(.numberPad)
                 .disabled(paymentState.isLoading)
@@ -59,7 +55,6 @@ struct AddBalanceView: View {
 //            .padding()
 
             Button {
-//                addBalance()
                 checkCoupon()
             } label: {
                 Text(LocalizedStringKey.send)
@@ -119,6 +114,7 @@ extension AddBalanceView {
     }
     
     func startPayment(amount: Double) {
+        paymentState.isLoading = true
         viewModel.updateAmount(amount.toString())
         viewModel.startPayment()
     }

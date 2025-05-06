@@ -31,19 +31,6 @@ struct ProfileView: View {
                             .customFont(weight: .bold, size: 14)
                             .foregroundColor(.white)
                         
-//                        HStack {
-//                            Text("2 قوائم علنية")
-//                            Image(systemName: "circle.fill")
-//                                .resizable().frame(width: 4, height: 4)
-//                            Text("2 قوائم خاصة")
-//                            Image(systemName: "circle.fill")
-//                                .resizable().frame(width: 4, height: 4)
-//                            Text("1 أمنية بنظام القَطَّة")
-//
-//                        }
-//                        .customFont(weight: .regular, size: 12)
-//                        .foregroundColor(.white)
-                        
                         HStack {
                             Button {
                                 appRouter.navigate(to: .editProfile)
@@ -187,6 +174,12 @@ struct ProfileView: View {
                     }
             }
         }
+        .overlay(
+            MessageAlertObserverView(
+                message: $authViewModel.errorMessage,
+                alertType: .constant(.error)
+            )
+        )
         .onAppear {
             getConstants()
         }

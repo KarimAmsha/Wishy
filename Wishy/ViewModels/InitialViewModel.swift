@@ -304,6 +304,7 @@ class InitialViewModel: ObservableObject {
             self.isLoading = false
             switch result {
             case .success(let response):
+                print("details details \(response)")
                 if response.status {
                     self.product = response.items
                     self.errorMessage = nil
@@ -342,6 +343,7 @@ class InitialViewModel: ObservableObject {
             self.isLoading = false
             switch result {
             case .success(let response):
+                print("responseresponse \(response)")
                 if response.status {
                     self.favoriteItem = response.items
                     self.errorMessage = nil

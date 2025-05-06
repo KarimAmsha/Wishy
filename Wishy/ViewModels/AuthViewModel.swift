@@ -173,8 +173,11 @@ class AuthViewModel: ObservableObject {
                 case .failure(let error):
                     // Use the centralized error handling component
                     self.handleAPIError(error)
+                    print("eeeee \(error)")
+                    print("eeeee222 \(error.localizedDescription)")
                 }
             }, receiveValue: { [weak self] (response: SingleAPIResponse<User>) in
+                print("rrrr \(response)")
                 if response.status {
                     self?.user = response.items
                     self?.userSettings.logout()

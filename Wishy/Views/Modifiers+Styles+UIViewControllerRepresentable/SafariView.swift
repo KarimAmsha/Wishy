@@ -19,13 +19,25 @@ struct SafariView: UIViewControllerRepresentable {
             self.parent = parent
         }
 
+        func safariViewController(_ controller: SFSafariViewController, didCompleteInitialLoad didLoadSuccessfully: Bool) {
+            if !didLoadSuccessfully {
+                print("❌ SafariView failed to load")
+            }
+        }
+
         func safariViewController(_ controller: SFSafariViewController, initialLoadDidRedirectTo url: URL) {
             print("🔁 Redirected to: \(url.absoluteString)")
             parent.onRedirect(url)
         }
 
         func safariViewControllerDidFinish(_ controller: SFSafariViewController) {
+            parent.onRedirect(URL(string: "https://wishy.sa/tamara/cancel")!)
             print("❌ SafariView closed by user")
+        }
+                
+        func safariViewController(_ controller: SFSafariViewController, didRedirectTo URL: URL) {
+            print("🔁 Redirected to: \(URL.absoluteString)")
+            parent.onRedirect(URL)
         }
     }
 

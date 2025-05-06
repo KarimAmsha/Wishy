@@ -164,7 +164,7 @@ class AuthViewModel: ObservableObject {
         isLoading = true
         errorMessage = nil
         let endpoint = DataProvider.Endpoint.deleteAccount(id: userSettings.id ?? "", token: token)
-        
+
         DataProvider.shared.request(endpoint: endpoint, responseType: SingleAPIResponse<User>.self)
             .sink(receiveCompletion: { completion in
                 switch completion {
@@ -173,11 +173,8 @@ class AuthViewModel: ObservableObject {
                 case .failure(let error):
                     // Use the centralized error handling component
                     self.handleAPIError(error)
-                    print("eeeee \(error)")
-                    print("eeeee222 \(error.localizedDescription)")
                 }
             }, receiveValue: { [weak self] (response: SingleAPIResponse<User>) in
-                print("rrrr \(response)")
                 if response.status {
                     self?.user = response.items
                     self?.userSettings.logout()

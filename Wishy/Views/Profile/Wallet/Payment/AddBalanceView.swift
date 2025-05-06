@@ -70,7 +70,7 @@ struct AddBalanceView: View {
             Alert(title: Text(LocalizedStringKey.error), message: Text(alertMessage), dismissButton: .default(Text(LocalizedStringKey.ok)))
         }
         .onAppear {
-            GoSellSDK.mode = .sandbox
+            GoSellSDK.mode = .production
         }
         .overlay(
             MessageAlertObserverView(

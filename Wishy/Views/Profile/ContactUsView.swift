@@ -17,7 +17,7 @@ struct ContactUsView: View {
     @State private var email = ""
     @State private var phone = ""
     @StateObject private var viewModel = UserViewModel(errorHandling: ErrorHandling())
-    @State private var description: String = LocalizedStringKey.problemDetails
+    @State private var description: String = ""
     @State var placeholderString = LocalizedStringKey.problemDetails
     @FocusState private var keyIsFocused: Bool
     @StateObject private var initialViewModel = InitialViewModel(errorHandling: ErrorHandling())
@@ -66,20 +66,25 @@ struct ContactUsView: View {
                                 .customFont(weight: .regular, size: 12)
                                 .foregroundColor(.black1F1F1F())
                             
-                            TextEditor(text: self.$description)
-                                .foregroundColor(self.description == placeholderString ? .gray : .black)
-                                .customFont(weight: .regular, size: 14)
-                                .onTapGesture {
-                                    if self.description == placeholderString {
-                                        self.description = ""
-                                    }
+                            ZStack(alignment: .topLeading) {
+                                if description.isEmpty {
+                                    Text(LocalizedStringKey.problemDetails)
+                                        .foregroundColor(.grayA4ACAD())
+                                        .padding(.horizontal, 20)
+                                        .padding(.vertical, 16)
+                                        .customFont(weight: .regular, size: 14)
                                 }
-                                .scrollContentBackground(.hidden)
-                                .padding(.horizontal, 16)
-                                .padding(.vertical, 12)
-                                .frame(height: 204)
-                                .background(Color.clear)
-                                .roundedBackground(cornerRadius: 12, strokeColor: .primary(), lineWidth: 1)
+
+                                TextEditor(text: $description)
+                                    .foregroundColor(.black)
+                                    .customFont(weight: .regular, size: 14)
+                                    .scrollContentBackground(.hidden)
+                                    .padding(.horizontal, 16)
+                                    .padding(.vertical, 12)
+                                    .frame(height: 204)
+                                    .background(Color.clear)
+                            }
+                            .roundedBackground(cornerRadius: 12, strokeColor: .primary(), lineWidth: 1)
                         }
 
                         Spacer()
@@ -91,25 +96,6 @@ struct ContactUsView: View {
                     .frame(maxWidth: .infinity)
                     .frame(minHeight: geometry.size.height)
                 }
-                
-//                VStack(spacing: 10) {
-//                    LazyVGrid(columns: columns, spacing: 10) {
-//                        ForEach(0..<initialViewModel.appContactItem.count, id: \.self) { index in
-//                            Button(action: {
-//                                initialViewModel.handleButtonTapped(index: index)
-//                            }) {
-//                                Text(initialViewModel.appContactItem[index].Name)
-//                                    .customFont(weight: .medium, size: 15)
-//                                    .padding()
-//                                    .background(Color.primary())
-//                                    .foregroundColor(.white)
-//                                    .cornerRadius(8)
-//                            }
-//                            .frame(maxWidth: .infinity)
-//                        }
-//                    }
-//                }
-//                .padding()
 
                 Button {
                     addComplain()

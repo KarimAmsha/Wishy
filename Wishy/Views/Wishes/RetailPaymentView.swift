@@ -133,7 +133,7 @@ struct RetailPaymentView: View {
             }
         }
         .onAppear {
-            GoSellSDK.mode = .sandbox
+            GoSellSDK.mode = .production
             
             laodWishData()
         }

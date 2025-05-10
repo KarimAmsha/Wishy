@@ -11,12 +11,14 @@ extension Date {
     func toMillis() -> Int64! {
         return Int64(self.timeIntervalSince1970)
     }
-
+    
     func toString(format: String) -> String {
         let dateFormatter = DateFormatter()
+        dateFormatter.locale = Locale(identifier: "en_US_POSIX") 
         dateFormatter.dateFormat = format
         return dateFormatter.string(from: self)
     }
+
     
     func toFormattedDateString() -> String {
         let dateFormatter = DateFormatter()

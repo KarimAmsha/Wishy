@@ -101,17 +101,17 @@ struct GeneralAlertToastView: View {
 
     var iconName: String {
         switch type {
-        case .success: return "checkmark.circle.fill"
-        case .error: return "xmark.circle.fill"
-        case .info: return "info.circle.fill"
+        case .success: return "info.circle"//"checkmark.circle.fill"
+        case .error: return "info.circle"//"xmark.circle.fill"
+        case .info: return "info.circle"//"info.circle.fill"
         }
     }
 
     var iconColor: Color {
         switch type {
-        case .success: return .green
-        case .error: return .red
-        case .info: return .blue
+        case .success: return .primary()//.green
+        case .error: return .primary()//.red
+        case .info: return .primary()//.blue
         }
     }
 
@@ -119,7 +119,7 @@ struct GeneralAlertToastView: View {
         HStack(alignment: .top, spacing: 16) {
             Image(systemName: iconName)
                 .resizable()
-                .frame(width: 48, height: 48)
+                .frame(width: 40, height: 40)
                 .foregroundColor(iconColor)
                 .cornerRadius(24)
 

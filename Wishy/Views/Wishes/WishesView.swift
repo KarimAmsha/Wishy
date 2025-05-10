@@ -78,24 +78,34 @@ struct WishesView: View {
                                 }
 
                                 if let items = item.items, !items.isEmpty {
-                                    LazyHStack(spacing: 8) {
-                                        ForEach(items.prefix(4), id: \.self) { product in
-                                            if let imageURLString = product.image, let imageURL = URL(string: imageURLString) {
+                                    let displayItems = Array(items.prefix(4))
+                                    let columns = [GridItem(.flexible()), GridItem(.flexible())]
 
-                                                AsyncImageView(
-                                                    width: 65,
-                                                    height: 65,
-                                                    cornerRadius: 10,
-                                                    imageURL: imageURL,
-                                                    placeholder: Image(systemName: "photo"),
-                                                    contentMode: .fill
-                                                )
-                                                .cornerRadius(4)
-                                                .padding(6)
+                                    LazyVGrid(columns: columns, spacing: 8) {
+                                        ForEach(displayItems.indices, id: \.self) { index in
+                                            let product = displayItems[index]
+
+                                            if let imageURLString = product.image,
+                                               let imageURL = URL(string: imageURLString) {
+                                                
+                                                VStack {
+                                                    AsyncImageView(
+                                                        width: 65,
+                                                        height: 65,
+                                                        cornerRadius: 8,
+                                                        imageURL: imageURL,
+                                                        placeholder: Image(systemName: "photo"),
+                                                        contentMode: .fill
+                                                    )
+                                                    .frame(width: 65, height: 65)
+                                                    .clipped()
+                                                    .cornerRadius(8)
+                                                }
                                             }
                                         }
                                     }
-                                    .frame(height: 80) // Adjust height as necessary
+                                    .frame(height: 150)
+                                    .padding(6)
                                 } else {
                                     Image(systemName: "photo")
                                         .resizable()

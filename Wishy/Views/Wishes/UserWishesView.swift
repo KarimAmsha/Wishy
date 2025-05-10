@@ -51,7 +51,10 @@ struct UserWishesView: View {
                                     }
                                     .padding(.horizontal, 6)
                                     .padding(.vertical, 16)
+                                    
+                                    Spacer()
                                 }
+                                .frame(height: 280)
                                 .roundedBackground(cornerRadius: 4, strokeColor: .grayEBF0FF(), lineWidth: 1)
                                 .onTapGesture {
                                     if userId == UserSettings.shared.id {

@@ -10,7 +10,7 @@ import SwiftUI
 struct GroupListView: View {
     @State var isPublic = false
     @State var selectedGroup: Group?
-    let onSelect: (Group, Bool) -> Void
+    let onSelect: (Group, Bool, Double) -> Void
     let onCancel: () -> Void
     @StateObject var viewModel = WishesViewModel(errorHandling: ErrorHandling())
     @StateObject var initialViewModel = InitialViewModel(errorHandling: ErrorHandling())
@@ -93,7 +93,12 @@ struct GroupListView: View {
                 Button {
                     withAnimation {
                         if let item = selectedGroup {
-                            onSelect(item, isPublic)
+                            let cost = Double(initialViewModel.appconstantsItems?
+                                .settings?
+                                .first(where: { $0.name == "مبلغ الاكسبلور" })?
+                                .value ?? "") ?? 0.0
+
+                            onSelect(item, isPublic, cost)
                         }
                     }
                 } label: {
@@ -117,7 +122,7 @@ struct GroupListView: View {
 }
 
 #Preview {
-    GroupListView(onSelect: {_, _ in}, onCancel: {})
+    GroupListView(onSelect: { _, _, _  in}, onCancel: {})
 }
 
 struct RadioButton: View {

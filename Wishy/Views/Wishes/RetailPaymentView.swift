@@ -180,8 +180,8 @@ struct RetailPaymentView: View {
             products: [
                 TamaraProduct(
                     product_id: productId,
-                    variation_name: "",
-                    variation_sku: "",
+                    variation_name: wishesViewModel.wish?.product_id?.variation_name ?? "",
+                    variation_sku: wishesViewModel.wish?.product_id?.variation_sku ?? "",
                     qty: 1
                 )
             ]
@@ -206,7 +206,7 @@ struct RetailPaymentView: View {
             showTamaraPayment.toggle()
         }
     }
-    
+
 }
 
 extension RetailPaymentView {

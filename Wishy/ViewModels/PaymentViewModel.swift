@@ -23,6 +23,9 @@ class PaymentViewModel: NSObject, ObservableObject {
     var applePay = false
     var applePayUI = false
     @Published var paymentStatus: PaymentStatus?
+    var paymentIcon: UIImage {
+        UIImage(systemName: "creditcard") ?? UIImage()
+    }
 
     var applePayMerchantID: String
     {
@@ -78,15 +81,18 @@ extension PaymentViewModel: SessionDataSource {
         // Replace with actual customer details
 //        let customerIdentifier = settings.id ?? ""
         do {
-            let emailAddressCopy = try EmailAddress(emailAddressString: settings.user?.email ?? "")
-            let phoneNumberCopy = try PhoneNumber(isdNumber: "+966", phoneNumber: settings.user?.phone_number ?? "")
+            let phone = settings.user?.phone_number ?? "555555555"
+            let email = settings.user?.email ?? "dummy@wishy.sa"
+
+            let emailAddressCopy = try EmailAddress(emailAddressString: email)
+            let phoneNumberCopy = try PhoneNumber(isdNumber: "+966", phoneNumber: phone)
 
             return try goSellSDK.Customer(
                 emailAddress: emailAddressCopy,
                 phoneNumber: phoneNumberCopy,
-                firstName: settings.user?.full_name ?? "",
-                middleName: settings.user?.full_name ?? "",
-                lastName: settings.user?.full_name ?? ""
+                firstName: settings.user?.full_name ?? "Wishy",
+                middleName: "",
+                lastName: ""
             )
         } catch {
             // Handle the error appropriately

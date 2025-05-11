@@ -108,6 +108,11 @@ struct AddUserProductView: View {
             
             Button {
                 withAnimation {
+                    if let error = validateInputs() {
+                        viewModel.errorMessage = error
+                        return
+                    }
+
                     let images: [UIImage?] = selectedImages.map { $0.image }
 
                     handleImageUploadAndPostRequest(
@@ -222,6 +227,34 @@ extension AddUserProductView {
                 viewModel.isLoading = false
             }
         }
+    }
+    
+    func validateInputs() -> String? {
+        if selectedImages.isEmpty {
+            return "يجب عليك اختيار صورة واحدة على الأقل"
+        }
+        
+        if title.trimmingCharacters(in: .whitespaces).isEmpty {
+            return "يرجى إدخال عنوان المنتج"
+        }
+
+        if name.trimmingCharacters(in: .whitespaces).isEmpty {
+            return "يرجى إدخال اسم البائع"
+        }
+
+        if iban.trimmingCharacters(in: .whitespaces).isEmpty {
+            return "يرجى إدخال رقم الآيبان"
+        }
+
+        if total.trimmingCharacters(in: .whitespaces).isEmpty {
+            return "يرجى إدخال المبلغ التقديري"
+        }
+
+        if selectedCategory == nil {
+            return "يرجى اختيار التصنيف"
+        }
+
+        return nil
     }
 }
 

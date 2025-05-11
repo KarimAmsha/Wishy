@@ -12,8 +12,8 @@ enum PurchaseType: String, CaseIterable, Identifiable {
 }
 
 struct CheckoutView: View {
-    @State private var payCash: Bool = true
-    @State private var payMada: Bool = false
+    @State private var payCash: Bool = false
+    @State private var payMada: Bool = true
     @State private var payTamara: Bool = false
     @State private var payOnline: Bool = false
     @EnvironmentObject var appRouter: AppRouter
@@ -411,8 +411,8 @@ struct PaymentInformationSection: View {
                 .foregroundColor(.black121212())
 
             HStack {
-                CheckboxButton(title: LocalizedStringKey.payCash, isChecked: $payCash, other1: $payMada, other2: $payTamara)
-                Spacer()
+//                CheckboxButton(title: LocalizedStringKey.payCash, isChecked: $payCash, other1: $payMada, other2: $payTamara)
+//                Spacer()
                 CheckboxButton(title: LocalizedStringKey.payMada, isChecked: $payMada, other1: $payCash, other2: $payTamara)
                 Spacer()
                 CheckboxButton(title: LocalizedStringKey.payTamara, isChecked: $payTamara, other1: $payCash, other2: $payMada)

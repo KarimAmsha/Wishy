@@ -283,8 +283,14 @@ struct VIPGiftView: View {
 
             Button {
                 withAnimation {
+                    if let error = validateInputs() {
+                        viewModel.errorMessage = error
+                        return
+                    }
+                    
                     handleImageUploadAndPostRequest()
                 }
+
             } label: {
                 Text(LocalizedStringKey.submit)
             }
@@ -351,7 +357,7 @@ struct VIPGiftView: View {
         .popup(isPresented: $isShowingTimePicker) {
             let timeModel = DateTimeModel(pickerMode: .time) { time in
                 self.time = time
-                timeStr = time.toString(format: "hh: mm a")
+                timeStr = time.toEnglishTimeString()
                 isShowingTimePicker = false
             } onCancelAction: {
                 isShowingTimePicker = false
@@ -385,39 +391,70 @@ struct VIPGiftView: View {
         viewModel.isLoading = true
         let userID = UserSettings.shared.id ?? ""
 
-        // Convert images to [UIImage?] format
         let images: [UIImage?] = selectedImages.map { $0.image }
+
+        if images.isEmpty {
+            submitRequest(with: [])
+            return
+        }
 
         FirestoreService.shared.uploadMultipleImages(images: images, id: userID) { imageUrls, success in
             if success, let urls = imageUrls {
-                var imagesArray: [String] = []
-                for url in urls {
-                    imagesArray.append(url)
-                }
-
-                let body: [String: Any] = [
-                    "event_id": selectedEvent?.id ?? "",
-                    "gender": gender.value,
-                    "lat": region.center.latitude.toString(),
-                    "lng": region.center.longitude.toString(),
-                    "address": address,
-                    "date": dateStr,
-                    "time": timeStr,
-                    "note": note,
-                    "images": imagesArray,
-                    "reciver_phone": phone,
-                    "extra_note": description,
-                    "total": total,
-                    "isNeedOffer": String(isNeedOffer)
-                ]
-                
-                viewModel.addVIP2(params: body) {
-                    appRouter.navigateBack()
-                }
+                submitRequest(with: urls)
             } else {
                 self.viewModel.isLoading = false
-                self.viewModel.errorMessage = "Failed to upload images"
+                self.viewModel.errorMessage = "فشل رفع الصور، الرجاء المحاولة لاحقًا"
             }
+        }
+    }
+    
+    func validateInputs() -> String? {
+        if selectedEvent == nil {
+            return "يرجى اختيار المناسبة"
+        }
+
+        if address.trimmingCharacters(in: .whitespaces).isEmpty {
+            return "يرجى إدخال العنوان"
+        }
+
+        if dateStr.isEmpty {
+            return "يرجى اختيار التاريخ"
+        }
+
+        if timeStr.isEmpty {
+            return "يرجى اختيار الوقت"
+        }
+
+        if phone.trimmingCharacters(in: .whitespaces).isEmpty {
+            return "يرجى إدخال رقم الجوال"
+        }
+
+        if total.trimmingCharacters(in: .whitespaces).isEmpty {
+            return "يرجى إدخال المبلغ التقديري"
+        }
+
+        return nil
+    }
+    
+    func submitRequest(with imageUrls: [String]) {
+        let body: [String: Any] = [
+            "event_id": selectedEvent?.id ?? "",
+            "gender": gender.value,
+            "lat": region.center.latitude.toString(),
+            "lng": region.center.longitude.toString(),
+            "address": address,
+            "date": dateStr,
+            "time": timeStr,
+            "note": note,
+            "images": imageUrls,
+            "reciver_phone": phone,
+            "extra_note": description,
+            "total": total,
+            "isNeedOffer": String(isNeedOffer)
+        ]
+
+        viewModel.addVIP2(params: body) {
+            appRouter.navigateBack()
         }
     }
     

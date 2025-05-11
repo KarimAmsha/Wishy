@@ -19,6 +19,12 @@ extension Date {
         return dateFormatter.string(from: self)
     }
 
+    func toEnglishTimeString() -> String {
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.dateFormat = "hh:mm a"
+        return formatter.string(from: self)
+    }
     
     func toFormattedDateString() -> String {
         let dateFormatter = DateFormatter()

@@ -187,7 +187,6 @@
 		1ECC951E2BDD1874002BFE54 /* CustomTextFieldWithTitle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1ECC951B2BDD1874002BFE54 /* CustomTextFieldWithTitle.swift */; };
 		1ECC951F2BDD1874002BFE54 /* CustomDivider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1ECC951C2BDD1874002BFE54 /* CustomDivider.swift */; };
 		1ECC95222BDD1C21002BFE54 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 1ECC95202BDD1C21002BFE54 /* Localizable.strings */; };
-		1ECC952A2BDD2B02002BFE54 /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = 1ECC95292BDD2B02002BFE54 /* Alamofire */; };
 		1ECC952D2BDD2C02002BFE54 /* MainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1ECC952C2BDD2C02002BFE54 /* MainView.swift */; };
 		1ECC952F2BDD75E7002BFE54 /* MobileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1ECC952E2BDD75E7002BFE54 /* MobileView.swift */; };
 		1ECC95312BDD77B5002BFE54 /* SMSVerificationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1ECC95302BDD77B5002BFE54 /* SMSVerificationView.swift */; };
@@ -241,7 +240,7 @@
 		529EC50C2DC90304009AB1FF /* TamaraWebViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 529EC50B2DC90302009AB1FF /* TamaraWebViewModel.swift */; };
 		529EC50E2DC9031A009AB1FF /* TamaraWebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 529EC50D2DC90318009AB1FF /* TamaraWebView.swift */; };
 		52F03F922DC1448F00D11215 /* TamaraProduct.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52F03F912DC1448E00D11215 /* TamaraProduct.swift */; };
-		EBD3E74A720BEA314F0148F5 /* Pods_Wishy.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4B667FA6DBD96FEFF3FAA6B5 /* Pods_Wishy.framework */; };
+		54A6180AC67CEF93A80C6124 /* Pods_Wishy.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5D22D5591E97E8FD4660DBF9 /* Pods_Wishy.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -444,8 +443,6 @@
 		1EFB9B312C1C40B900C15CE4 /* AddUserProduct.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddUserProduct.swift; sourceTree = "<group>"; };
 		1EFB9B342C1C4CFE00C15CE4 /* VIPGiftView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VIPGiftView.swift; sourceTree = "<group>"; };
 		1EFB9B362C1C624B00C15CE4 /* EventListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventListView.swift; sourceTree = "<group>"; };
-		31C7D776385A8677660C14E6 /* Pods-Wishy.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Wishy.release.xcconfig"; path = "Target Support Files/Pods-Wishy/Pods-Wishy.release.xcconfig"; sourceTree = "<group>"; };
-		4B667FA6DBD96FEFF3FAA6B5 /* Pods_Wishy.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Wishy.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		520BB0372DC959AB00DB6315 /* SafariView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SafariView.swift; sourceTree = "<group>"; };
 		529EC5032DC8B8EF009AB1FF /* ErrorObserverView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorObserverView.swift; sourceTree = "<group>"; };
 		529EC5052DC8C0A9009AB1FF /* PopupObserverView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PopupObserverView.swift; sourceTree = "<group>"; };
@@ -454,7 +451,9 @@
 		529EC50B2DC90302009AB1FF /* TamaraWebViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TamaraWebViewModel.swift; sourceTree = "<group>"; };
 		529EC50D2DC90318009AB1FF /* TamaraWebView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TamaraWebView.swift; sourceTree = "<group>"; };
 		52F03F912DC1448E00D11215 /* TamaraProduct.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TamaraProduct.swift; sourceTree = "<group>"; };
-		B5A6968E8E0A25FFA94E4E57 /* Pods-Wishy.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Wishy.debug.xcconfig"; path = "Target Support Files/Pods-Wishy/Pods-Wishy.debug.xcconfig"; sourceTree = "<group>"; };
+		5D22D5591E97E8FD4660DBF9 /* Pods_Wishy.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Wishy.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		D2534A70AB7D2E6CD03D10E8 /* Pods-Wishy.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Wishy.debug.xcconfig"; path = "Target Support Files/Pods-Wishy/Pods-Wishy.debug.xcconfig"; sourceTree = "<group>"; };
+		FD93D33F5A34C135AD6BAE44 /* Pods-Wishy.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Wishy.release.xcconfig"; path = "Target Support Files/Pods-Wishy/Pods-Wishy.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -477,7 +476,6 @@
 				1ECC94B52BDC5D8B002BFE54 /* FirebaseStorage in Frameworks */,
 				1ECC94AF2BDC5D8B002BFE54 /* FirebasePerformance in Frameworks */,
 				1ECC949B2BDC5D8B002BFE54 /* FirebaseFirestore in Frameworks */,
-				1ECC952A2BDD2B02002BFE54 /* Alamofire in Frameworks */,
 				1ECC94A52BDC5D8B002BFE54 /* FirebaseInAppMessaging-Beta in Frameworks */,
 				1ECC94852BDC5D8B002BFE54 /* FirebaseAnalyticsOnDeviceConversion in Frameworks */,
 				1ECC94B32BDC5D8B002BFE54 /* FirebaseRemoteConfigSwift in Frameworks */,
@@ -493,7 +491,7 @@
 				1ECC948D2BDC5D8B002BFE54 /* FirebaseAppDistribution-Beta in Frameworks */,
 				1ECC94992BDC5D8B002BFE54 /* FirebaseDynamicLinks in Frameworks */,
 				1ECC949F2BDC5D8B002BFE54 /* FirebaseFirestoreSwift in Frameworks */,
-				EBD3E74A720BEA314F0148F5 /* Pods_Wishy.framework in Frameworks */,
+				54A6180AC67CEF93A80C6124 /* Pods_Wishy.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -937,7 +935,7 @@
 				1EEC2BCE2BD83E6000975953 /* Wishy */,
 				1EEC2BCD2BD83E6000975953 /* Products */,
 				304E035519AD4FBEEEDC9A60 /* Pods */,
-				ED8BB8D4EC228C273A10CB6D /* Frameworks */,
+				4D31D1E18A0BD75C713FBF7B /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -997,16 +995,16 @@
 		304E035519AD4FBEEEDC9A60 /* Pods */ = {
 			isa = PBXGroup;
 			children = (
-				B5A6968E8E0A25FFA94E4E57 /* Pods-Wishy.debug.xcconfig */,
-				31C7D776385A8677660C14E6 /* Pods-Wishy.release.xcconfig */,
+				D2534A70AB7D2E6CD03D10E8 /* Pods-Wishy.debug.xcconfig */,
+				FD93D33F5A34C135AD6BAE44 /* Pods-Wishy.release.xcconfig */,
 			);
 			path = Pods;
 			sourceTree = "<group>";
 		};
-		ED8BB8D4EC228C273A10CB6D /* Frameworks */ = {
+		4D31D1E18A0BD75C713FBF7B /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				4B667FA6DBD96FEFF3FAA6B5 /* Pods_Wishy.framework */,
+				5D22D5591E97E8FD4660DBF9 /* Pods_Wishy.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -1018,11 +1016,11 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 1EEC2BDA2BD83E6300975953 /* Build configuration list for PBXNativeTarget "Wishy" */;
 			buildPhases = (
-				B0A7D324926FA351E8CFA892 /* [CP] Check Pods Manifest.lock */,
+				BEB1BF42C154DF75BB432D96 /* [CP] Check Pods Manifest.lock */,
 				1EEC2BC82BD83E6000975953 /* Sources */,
 				1EEC2BC92BD83E6000975953 /* Frameworks */,
 				1EEC2BCA2BD83E6000975953 /* Resources */,
-				477302307E50FAE30965B4B3 /* [CP] Embed Pods Frameworks */,
+				AEC374D171DFC00DCC1B324B /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -1058,7 +1056,6 @@
 				1ECC94B42BDC5D8B002BFE54 /* FirebaseStorage */,
 				1ECC94B62BDC5D8B002BFE54 /* FirebaseStorageCombine-Community */,
 				1ECC94B92BDC5E17002BFE54 /* PopupView */,
-				1ECC95292BDD2B02002BFE54 /* Alamofire */,
 				1EA740502BFB909E0028AAD0 /* SkeletonUI */,
 				1EA740552BFBADC20028AAD0 /* RefreshableScrollView */,
 			);
@@ -1094,7 +1091,6 @@
 			packageReferences = (
 				1ECC94812BDC5D8B002BFE54 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
 				1ECC94B82BDC5E17002BFE54 /* XCRemoteSwiftPackageReference "PopupView" */,
-				1ECC95282BDD2B02002BFE54 /* XCRemoteSwiftPackageReference "Alamofire" */,
 				1EA7404F2BFB909D0028AAD0 /* XCRemoteSwiftPackageReference "SkeletonUI" */,
 				1EA740542BFBADC20028AAD0 /* XCRemoteSwiftPackageReference "RefreshableScrollView" */,
 			);
@@ -1128,7 +1124,7 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		477302307E50FAE30965B4B3 /* [CP] Embed Pods Frameworks */ = {
+		AEC374D171DFC00DCC1B324B /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -1149,7 +1145,7 @@
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-Wishy/Pods-Wishy-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		B0A7D324926FA351E8CFA892 /* [CP] Check Pods Manifest.lock */ = {
+		BEB1BF42C154DF75BB432D96 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -1512,16 +1508,18 @@
 		};
 		1EEC2BDB2BD83E6300975953 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = B5A6968E8E0A25FFA94E4E57 /* Pods-Wishy.debug.xcconfig */;
+			baseConfigurationReference = D2534A70AB7D2E6CD03D10E8 /* Pods-Wishy.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = Wishy/Wishy.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
+				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 3;
 				DEVELOPMENT_ASSET_PATHS = "\"Wishy/Preview Content\"";
-				DEVELOPMENT_TEAM = CKZBH9QCG3;
+				DEVELOPMENT_TEAM = "";
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = CKZBH9QCG3;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Wishy/Info.plist;
@@ -1546,6 +1544,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = sa.com.Fazaa.Wishy;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = WishyDistProfile;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
@@ -1558,16 +1557,18 @@
 		};
 		1EEC2BDC2BD83E6300975953 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 31C7D776385A8677660C14E6 /* Pods-Wishy.release.xcconfig */;
+			baseConfigurationReference = FD93D33F5A34C135AD6BAE44 /* Pods-Wishy.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = Wishy/Wishy.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
+				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 3;
 				DEVELOPMENT_ASSET_PATHS = "\"Wishy/Preview Content\"";
-				DEVELOPMENT_TEAM = CKZBH9QCG3;
+				DEVELOPMENT_TEAM = "";
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = CKZBH9QCG3;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Wishy/Info.plist;
@@ -1592,6 +1593,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = sa.com.Fazaa.Wishy;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = WishyDistProfile;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
@@ -1656,14 +1658,6 @@
 			requirement = {
 				kind = upToNextMajorVersion;
 				minimumVersion = 2.9.1;
-			};
-		};
-		1ECC95282BDD2B02002BFE54 /* XCRemoteSwiftPackageReference "Alamofire" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/Alamofire/Alamofire.git";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 5.8.1;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
@@ -1818,11 +1812,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 1ECC94B82BDC5E17002BFE54 /* XCRemoteSwiftPackageReference "PopupView" */;
 			productName = PopupView;
-		};
-		1ECC95292BDD2B02002BFE54 /* Alamofire */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 1ECC95282BDD2B02002BFE54 /* XCRemoteSwiftPackageReference "Alamofire" */;
-			productName = Alamofire;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

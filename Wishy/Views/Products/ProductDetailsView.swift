@@ -197,7 +197,7 @@ struct ProductDetailsView: View {
         .overlay(alertObservers)
         .onAppear {
             getDetails()
-            GoSellSDK.mode = .sandbox
+            GoSellSDK.mode = .production
         }
     }
 

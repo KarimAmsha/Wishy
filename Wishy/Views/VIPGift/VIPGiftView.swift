@@ -27,7 +27,7 @@ struct VIPGiftView: View {
     @State var countryPattern : String = "############"
     @FocusState private var keyIsFocused: Bool
     @State var countryPatternPalceholder : String = "966#########"
-    @State private var description: String = LocalizedStringKey.description
+    @State private var description: String = ""
     @State var placeholderString = LocalizedStringKey.description
     @State private var isShowingEvents = false
     @State private var selectedEvent: Event?
@@ -243,15 +243,9 @@ struct VIPGiftView: View {
                             .customFont(weight: .regular, size: 12)
                             .foregroundColor(.black1F1F1F())
 
-                        TextEditor(text: self.$description)
+                        TextEditor(text: $description)
                             .customFont(weight: .regular, size: 14)
-                            .foregroundColor(self.description == placeholderString ? .gray : .black121212())
-                            .frame(height: 100)
-                            .onTapGesture {
-                                if self.description == placeholderString {
-                                    self.description = ""
-                                }
-                            }
+                            .foregroundColor(.black121212())
                             .padding(.horizontal)
                             .padding(.vertical, 14)
                             .cornerRadius(12)
@@ -268,12 +262,6 @@ struct VIPGiftView: View {
                         .onChange(of: total) { value in
                             total = value.toInt()?.toEnglish() ?? ""
                         }
-
-//                    Toggle(isOn: $isNeedOffer) {
-//                        Text(LocalizedStringKey.needsOffer)
-//                            .customFont(weight: .bold, size: 14)
-//                            .foregroundColor(.black121212())
-//                    }
                 }
             }
             
@@ -427,6 +415,10 @@ struct VIPGiftView: View {
 
         if phone.trimmingCharacters(in: .whitespaces).isEmpty {
             return "يرجى إدخال رقم الجوال"
+        }
+
+        if description.trimmingCharacters(in: .whitespaces).isEmpty {
+            return "يرجى إدخال الوصف"
         }
 
         if total.trimmingCharacters(in: .whitespaces).isEmpty {

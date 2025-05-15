@@ -32,10 +32,10 @@ class PaymentViewModel: NSObject, ObservableObject {
         return "merchant.wishy.sa.com"
     }
     
-//    var merchantID: String?
-//    {
-//        return "35263831"
-//    }
+    var merchantID: String?
+    {
+        return "35263831"
+    }
 
     func startPayment() {
         let session = Session()

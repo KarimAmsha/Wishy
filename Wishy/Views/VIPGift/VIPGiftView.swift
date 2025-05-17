@@ -249,6 +249,7 @@ struct VIPGiftView: View {
                             .padding(.horizontal)
                             .padding(.vertical, 14)
                             .cornerRadius(12)
+                            .frame(height: 180)
                             .overlay(
                                 RoundedRectangle(cornerRadius: 12)
                                     .inset(by: 0.5)

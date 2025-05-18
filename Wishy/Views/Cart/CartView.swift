@@ -112,6 +112,7 @@ extension CartView {
     func updateCartItems(cartId: String, qty: Int) {
         viewModel.updateCartItems(cartItems: [UpdateCart(cart_id: cartId, qty: qty)], onsuccess: {
             getCartItems()
+            NotificationCenter.default.post(name: .cartUpdated, object: nil)
         })
     }
 
@@ -144,9 +145,7 @@ extension CartView {
     func deleteCart() {
         viewModel.deleteCart(onsuccess: {
             getCartItems()
-            viewModel.cartCount {
-                //
-            }
+            NotificationCenter.default.post(name: .cartUpdated, object: nil)
         })
     }
     

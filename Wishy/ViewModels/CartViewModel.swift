@@ -15,7 +15,7 @@ class CartViewModel: ObservableObject {
     private let errorHandling: ErrorHandling
     @Published var cart: Cart?
     @Published var cartItems: CartItems?
-    @Published var cartCount: Int?
+    @Published var cartCount: Int = 0
     @Published var cartTotal: CartTotal?
 
     init(errorHandling: ErrorHandling) {
@@ -174,9 +174,9 @@ class CartViewModel: ObservableObject {
         }
     }
     
-    func cartCount(onsuccess: @escaping () -> Void) {
+    func fetchCartCount() {
         guard let token = UserSettings.shared.token else {
-            handleAPIError(.customError(message: LocalizedStringKey.tokenError))
+            self.handleAPIError(.customError(message: LocalizedStringKey.tokenError))
             return
         }
 
@@ -185,25 +185,23 @@ class CartViewModel: ObservableObject {
         let endpoint = DataProvider.Endpoint.cartCount(token: token)
 
         DataProvider.shared.request(endpoint: endpoint, responseType: SingleAPIResponse<Int>.self) { [weak self] result in
-            self?.isLoading = false
-            switch result {
-            case .success(let response):
-                if response.status {
-                    self?.cartCount = response.items
-                    self?.errorMessage = nil
-                    onsuccess()
-                } else {
-                    // Use the centralized error handling component
-                    self?.handleAPIError(.customError(message: response.message))
-                }
+            DispatchQueue.main.async {
                 self?.isLoading = false
-            case .failure(let error):
-                // Use the centralized error handling component
-                self?.handleAPIError(.customError(message: error.localizedDescription))
+                switch result {
+                case .success(let response):
+                    if response.status {
+                        self?.cartCount = response.items ?? 0
+                        self?.errorMessage = nil
+                    } else {
+                        self?.handleAPIError(.customError(message: response.message))
+                    }
+                case .failure(let error):
+                    self?.handleAPIError(.customError(message: error.localizedDescription))
+                }
             }
         }
     }
-    
+
     func cartTotal(onsuccess: @escaping () -> Void) {
         guard let token = UserSettings.shared.token else {
             handleAPIError(.customError(message: LocalizedStringKey.tokenError))

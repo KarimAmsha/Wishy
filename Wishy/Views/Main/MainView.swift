@@ -15,7 +15,6 @@ struct MainView: View {
     @State private var path = NavigationPath()
     @ObservedObject var appRouter = AppRouter()
     @ObservedObject var viewModel = InitialViewModel(errorHandling: ErrorHandling())
-    @StateObject var cartViewModel = CartViewModel(errorHandling: ErrorHandling())
 
     var body: some View {
         NavigationStack(path: $appRouter.navPath) {
@@ -62,7 +61,7 @@ struct MainView: View {
                                     
                                     Spacer()
 
-                                    TabBarIcon(appState: appState, assignedPage: .explor, width: geometry.size.width/6, height: geometry.size.height/30, iconName: "ic_wishes", tabName: LocalizedStringKey.explor, isAddButton: false, count: 0, isCart: false)
+                                    TabBarIcon(appState: appState, assignedPage: .explor, width: geometry.size.width/6, height: geometry.size.height/30, iconName: "ic_wishes", tabName: LocalizedStringKey.explor, isAddButton: false, isCart: false)
 
                                     Spacer()
 

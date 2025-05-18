@@ -240,6 +240,7 @@
 		529EC50A2DC8C93D009AB1FF /* Binding+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 529EC5092DC8C929009AB1FF /* Binding+Extension.swift */; };
 		529EC50C2DC90304009AB1FF /* TamaraWebViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 529EC50B2DC90302009AB1FF /* TamaraWebViewModel.swift */; };
 		529EC50E2DC9031A009AB1FF /* TamaraWebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 529EC50D2DC90318009AB1FF /* TamaraWebView.swift */; };
+		52BEF2EF2DD9DD9D0013309C /* Notification.Name+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52BEF2EE2DD9DD8E0013309C /* Notification.Name+Extension.swift */; };
 		52F03F922DC1448F00D11215 /* TamaraProduct.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52F03F912DC1448E00D11215 /* TamaraProduct.swift */; };
 		54A6180AC67CEF93A80C6124 /* Pods_Wishy.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5D22D5591E97E8FD4660DBF9 /* Pods_Wishy.framework */; };
 /* End PBXBuildFile section */
@@ -452,6 +453,7 @@
 		529EC5092DC8C929009AB1FF /* Binding+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Binding+Extension.swift"; sourceTree = "<group>"; };
 		529EC50B2DC90302009AB1FF /* TamaraWebViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TamaraWebViewModel.swift; sourceTree = "<group>"; };
 		529EC50D2DC90318009AB1FF /* TamaraWebView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TamaraWebView.swift; sourceTree = "<group>"; };
+		52BEF2EE2DD9DD8E0013309C /* Notification.Name+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Notification.Name+Extension.swift"; sourceTree = "<group>"; };
 		52F03F912DC1448E00D11215 /* TamaraProduct.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TamaraProduct.swift; sourceTree = "<group>"; };
 		5D22D5591E97E8FD4660DBF9 /* Pods_Wishy.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Wishy.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		D2534A70AB7D2E6CD03D10E8 /* Pods-Wishy.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Wishy.debug.xcconfig"; path = "Target Support Files/Pods-Wishy/Pods-Wishy.debug.xcconfig"; sourceTree = "<group>"; };
@@ -781,6 +783,7 @@
 		1ECC94592BDC5AA5002BFE54 /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
+				52BEF2EE2DD9DD8E0013309C /* Notification.Name+Extension.swift */,
 				529EC5092DC8C929009AB1FF /* Binding+Extension.swift */,
 				1ECC945A2BDC5B67002BFE54 /* Bundle+Extensions.swift */,
 				1ECC94642BDC5B68002BFE54 /* Color+Extensions.swift */,
@@ -1219,6 +1222,7 @@
 				1EC27FF42C0392060007279D /* UpdateCart.swift in Sources */,
 				1ECC946F2BDC5B68002BFE54 /* NSNotification+Extensions.swift in Sources */,
 				1EDEF6832BE1A1D200863C10 /* SelectedGiftView.swift in Sources */,
+				52BEF2EF2DD9DD9D0013309C /* Notification.Name+Extension.swift in Sources */,
 				1ECC94CE2BDC5E49002BFE54 /* CustomToggleStyle.swift in Sources */,
 				1EA7405C2BFBE9300028AAD0 /* Settings.swift in Sources */,
 				1ECC947B2BDC5B8B002BFE54 /* Utilities.swift in Sources */,
@@ -1518,10 +1522,12 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = Wishy/Wishy.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 4;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
+				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 5;
 				DEVELOPMENT_ASSET_PATHS = "\"Wishy/Preview Content\"";
-				DEVELOPMENT_TEAM = CKZBH9QCG3;
+				DEVELOPMENT_TEAM = "";
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = CKZBH9QCG3;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Wishy/Info.plist;
@@ -1546,6 +1552,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = sa.com.Fazaa.Wishy;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = WishyDistProfile;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
@@ -1564,10 +1571,12 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = Wishy/Wishy.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 4;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
+				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 5;
 				DEVELOPMENT_ASSET_PATHS = "\"Wishy/Preview Content\"";
-				DEVELOPMENT_TEAM = CKZBH9QCG3;
+				DEVELOPMENT_TEAM = "";
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = CKZBH9QCG3;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Wishy/Info.plist;
@@ -1592,6 +1601,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = sa.com.Fazaa.Wishy;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = WishyDistProfile;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;

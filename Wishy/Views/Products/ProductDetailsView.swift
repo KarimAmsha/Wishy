@@ -122,6 +122,7 @@ struct ProductDetailsView: View {
         }
         .popup(isPresented: $showAddToCartPopup) {
             AddToCartPopup(isPresented: $showAddToCartPopup) {
+                NotificationCenter.default.post(name: .cartUpdated, object: nil)
                 appState.currentPage = .cart
             }
         } customize: {
@@ -366,9 +367,6 @@ struct ProductDetailsView: View {
                 self.showAddToCartPopup = true
             }
         })
-        cartViewModel.cartCount {
-            // refresh count
-        }
     }
 
     func addToFavorite() {

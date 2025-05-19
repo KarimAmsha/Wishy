@@ -534,8 +534,12 @@ class InitialViewModel: ObservableObject {
 }
 
 extension InitialViewModel {
-    private func handleAPIError(_ error: APIClient.APIError) {
+    fileprivate func handleAPIError(_ error: APIClient.APIError) {
         let errorDescription = errorHandling.handleAPIError(error)
-        errorMessage = errorDescription
+        errorMessage = nil
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
+            self.errorMessage = errorDescription
+        }
     }
 }

@@ -232,11 +232,15 @@ class AuthViewModel: ObservableObject {
 }
 
 extension AuthViewModel {
-    func handleAPIError(_ error: APIClient.APIError) {
+    fileprivate func handleAPIError(_ error: APIClient.APIError) {
         let errorDescription = errorHandling.handleAPIError(error)
-        errorMessage = errorDescription
+        errorMessage = nil
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
+            self.errorMessage = errorDescription
+        }
     }
-    
+
     func handleVerificationStatus(isVerified: Bool) {
         if isVerified {
             // User is verified

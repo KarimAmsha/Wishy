@@ -7,6 +7,7 @@
 
 import SwiftUI
 import goSellSDK
+import PassKit
 
 enum PaymentStatus: Equatable {
     case success
@@ -29,14 +30,14 @@ class PaymentViewModel: NSObject, ObservableObject {
 
     var applePayMerchantID: String
     {
-        return "merchant.wishy.sa.com"
+        return "merchant.wishy.live.sa.com"
     }
     
     var merchantID: String?
     {
         return "35263831"
     }
-
+    
     func startPayment() {
         let session = Session()
         session.dataSource = self
@@ -52,6 +53,29 @@ class PaymentViewModel: NSObject, ObservableObject {
         }
     }
     
+//    func startPayment() {
+//        let session = Session()
+//        session.dataSource = self
+//        session.delegate = self
+//        session.start()  // لا تحتاج try
+//    }
+    
+//    func startPayment() {
+//        let session = Session()
+//        session.dataSource = self
+//        session.delegate = self
+//
+//        do {
+//            if applePay {
+//                try session.startApplePay()
+//            } else {
+//                session.start() // لا تحتاج try
+//            }
+//        } catch {
+//            print("Error starting Apple Pay session: \(error)")
+//        }
+//    }
+
     // Function to update the amount based on user input
     func updateAmount(_ newAmount: String) {
         if let decimalAmount = Decimal(string: newAmount) {
@@ -124,5 +148,21 @@ extension PaymentViewModel: SessionDelegate {
         // Handle payment cancellation
         print("Payment Cancelled")
         paymentStatus = .cancelled
+    }
+    
+    func checkApplePaySupport() {
+        let supportedNetworks: [PKPaymentNetwork] = [.visa, .masterCard, .mada] // أو حسب البوابة
+
+        let canMakePayment = PKPaymentAuthorizationController.canMakePayments()
+        let canMakePaymentWithNetworks = PKPaymentAuthorizationController.canMakePayments(usingNetworks: supportedNetworks)
+
+        print("🟢 Apple Pay متاح على الجهاز؟", canMakePayment)
+        print("🟢 مع الشبكات؟", canMakePaymentWithNetworks)
+
+        if !canMakePayment || !canMakePaymentWithNetworks {
+            print("❌ الجهاز لا يدعم Apple Pay أو الشبكات غير مدعومة")
+        } else {
+            print("✅ Apple Pay متاحة وجاهزة")
+        }
     }
 }

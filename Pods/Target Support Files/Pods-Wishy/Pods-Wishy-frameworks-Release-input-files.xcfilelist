@@ -1,10 +1,12 @@
 ${PODS_ROOT}/Target Support Files/Pods-Wishy/Pods-Wishy-frameworks.sh
 ${BUILT_PRODUCTS_DIR}/Alamofire/Alamofire.framework
+${BUILT_PRODUCTS_DIR}/CommonDataModelsKit-iOS/CommonDataModelsKit_iOS.framework
 ${BUILT_PRODUCTS_DIR}/EditableTextInsetsTextFieldV2/EditableTextInsetsTextFieldV2.framework
 ${BUILT_PRODUCTS_DIR}/Moya/Moya.framework
 ${BUILT_PRODUCTS_DIR}/SwiftyRSA/SwiftyRSA.framework
 ${BUILT_PRODUCTS_DIR}/TamaraSDK/TamaraSDK.framework
 ${BUILT_PRODUCTS_DIR}/TapAdditionsKitV2/TapAdditionsKitV2.framework
+${BUILT_PRODUCTS_DIR}/TapApplePayKit-iOS/TapApplePayKit_iOS.framework
 ${BUILT_PRODUCTS_DIR}/TapApplicationV2/TapApplicationV2.framework
 ${BUILT_PRODUCTS_DIR}/TapBundleLocalizationV2/TapBundleLocalizationV2.framework
 ${BUILT_PRODUCTS_DIR}/TapCardVlidatorKit-iOS/TapCardVlidatorKit_iOS.framework
@@ -12,6 +14,7 @@ ${BUILT_PRODUCTS_DIR}/TapEditableViewV2/TapEditableViewV2.framework
 ${BUILT_PRODUCTS_DIR}/TapFontsKitV2/TapFontsKitV2.framework
 ${BUILT_PRODUCTS_DIR}/TapGLKitV2/TapGLKitV2.framework
 ${BUILT_PRODUCTS_DIR}/TapKeychainV2/TapKeychainV2.framework
+${BUILT_PRODUCTS_DIR}/TapNetworkKit-iOS/TapNetworkKit_iOS.framework
 ${BUILT_PRODUCTS_DIR}/TapNetworkManagerV2/TapNetworkManagerV2.framework
 ${BUILT_PRODUCTS_DIR}/TapNibViewV2/TapNibViewV2.framework
 ${BUILT_PRODUCTS_DIR}/TapResponderChainInputViewV2/TapResponderChainInputViewV2.framework

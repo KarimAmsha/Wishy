@@ -7,6 +7,6 @@ target 'Wishy' do
 
   # Pods for Wishy
   pod 'goSellSDK'
+  pod 'TapApplePayKit-iOS'
   pod 'TamaraSDK'
-
 end

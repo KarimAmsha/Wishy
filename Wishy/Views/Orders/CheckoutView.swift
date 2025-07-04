@@ -11,11 +11,42 @@ enum PurchaseType: String, CaseIterable, Identifiable {
     var id: String { self.rawValue }
 }
 
+enum PaymentOption: String, CaseIterable, Identifiable {
+    case hyperpay, tamara, cash
+
+    var id: String { self.rawValue }
+    var displayName: String {
+        switch self {
+        case .hyperpay: return "الدفع الإلكتروني (بطاقة/أبل باي)"
+        case .tamara: return "تمارا (ادفع لاحقًا)"
+        case .cash: return "الدفع عند الاستلام"
+        }
+    }
+}
+
+enum HyperpayBrand: Int {
+    case visa = 1
+    case mada = 2
+    case apple = 3
+
+    var displayName: String {
+        switch self {
+        case .visa: return "VISA"
+        case .mada: return "MADA"
+        case .apple: return "APPLEPAY"
+        }
+    }
+
+    static func from(string: String) -> HyperpayBrand {
+        switch string.uppercased() {
+        case "MADA": return .mada
+        case "APPLEPAY": return .apple
+        default: return .visa
+        }
+    }
+}
+
 struct CheckoutView: View {
-    @State private var payCash: Bool = false
-    @State private var payMada: Bool = true
-    @State private var payTamara: Bool = false
-    @State private var payOnline: Bool = false
     @EnvironmentObject var appRouter: AppRouter
     @StateObject var viewModel = OrderViewModel(errorHandling: ErrorHandling())
     @State private var isShowingAddress = false
@@ -53,6 +84,11 @@ struct CheckoutView: View {
     @State private var showTamaraPayment = false
     @State private var checkoutUrl = ""
     @State var tamaraViewModel: TamaraWebViewModel? = nil
+    @State private var selectedPayment: PaymentOption = .hyperpay
+    @State private var selectedBrand: HyperpayBrand = .mada
+    let availableBrands = ["MADA", "VISA", "APPLEPAY"]
+    @StateObject private var hyperPaymentViewModel = HyperPaymentViewModel()
+    @State private var currentHyperpayId: String?
 
     @State private var selectedAddress: AddressItem? {
         didSet {
@@ -97,8 +133,28 @@ struct CheckoutView: View {
                     NotesView(notes: $notes, placeholder: placeholderString)
                         .disabled(orderViewModel.isLoading)
 
-                    PaymentInformationSection(payCash: $payCash, payMada: $payMada, payTamara: $payTamara)
-                        .disabled(orderViewModel.isLoading)
+                    VStack(alignment: .leading, spacing: 16) {
+                        Text("اختر وسيلة الدفع").font(.headline)
+                        Picker("طريقة الدفع", selection: $selectedPayment) {
+                            ForEach(PaymentOption.allCases) { option in
+                                Text(option.displayName).tag(option)
+                            }
+                        }
+                        .pickerStyle(.segmented)
+                        
+                        if selectedPayment == .hyperpay {
+                            VStack(alignment: .leading, spacing: 8) {
+                                Text("نوع البطاقة")
+                                Picker("نوع البطاقة", selection: $selectedBrand) {
+                                    ForEach([HyperpayBrand.visa, .mada, .apple], id: \.self) { brand in
+                                        Text(brand.displayName).tag(brand)
+                                    }
+                                }
+                                .pickerStyle(.segmented)
+                            }
+                        }
+                    }
+                    .disabled(orderViewModel.isLoading)
 
                     if let cartTotal = cartViewModel.cartTotal {
                         OrderSummarySection(cartTotal: cartTotal)
@@ -112,20 +168,30 @@ struct CheckoutView: View {
                 }
                 
                 Button(action: {
-                    // Place order logic
-                    if payCash {
+                    if selectedPayment == .cash {
                         addOrder()
-                    } else if payMada {
-                        if let cartTotal = cartViewModel.cartTotal {
-                            startPayment(amount: cartTotal.final_total ?? 0.0)
-                        }
-                    } else if payTamara {
+                    } else if selectedPayment == .tamara {
                         tamaraCheckout()
+                    } else if selectedPayment == .hyperpay {
+                        if let cartTotal = cartViewModel.cartTotal {
+                            startHyperpayPayment(amount: 2.00)//cartTotal.final_total ?? 0.0)
+                        }
                     }
                 }) {
                     HStack {
-                        Text(LocalizedStringKey.payNow)
+                        if selectedPayment == .hyperpay {
+                            Image(systemName: "creditcard")
+                            Text("ادفع إلكترونيًا")
+                        } else if selectedPayment == .tamara {
+                            Image(systemName: "cart.fill")
+                            Text("ادفع عبر تمارا")
+                        } else {
+                            Image(systemName: "banknote")
+                            Text("الدفع عند الاستلام")
+                        }
                     }
+                    .font(.headline)
+                    .frame(maxWidth: .infinity)
                 }
                 .buttonStyle(GradientPrimaryButton(fontSize: 16, fontWeight: .bold, background: Color.primaryGradientColor(), foreground: .white, height: 48, radius: 12))
                 .disabled(orderViewModel.isLoading)
@@ -216,6 +282,12 @@ struct CheckoutView: View {
         )
         .overlay(
             MessageAlertObserverView(
+                message: $hyperPaymentViewModel.errorMessage,
+                alertType: .constant(.error)
+            )
+        )
+        .overlay(
+            MessageAlertObserverView(
                 message: $orderViewModel.errorMessage,
                 alertType: .constant(.error)
             )
@@ -225,53 +297,23 @@ struct CheckoutView: View {
             streetName = ""
             selectedAddress = nil
         }
-        .onChange(of: paymentViewModel.paymentStatus) { status in
-            guard let status = status else { return }
-
-            orderViewModel.isLoading = false
-
-            switch status {
-            case .success:
-                addOrder()
-            case .failed(let message):
-                orderViewModel.errorMessage = message
-            case .cancelled:
-                orderViewModel.errorMessage = "تم إلغاء عملية الدفع"
+        .fullScreenCover(isPresented: $hyperPaymentViewModel.isShowingCheckout) {
+            if let checkoutId = hyperPaymentViewModel.checkoutId {
+                HyperpayCheckoutView(
+                    checkoutId: checkoutId,
+                    paymentBrands: [selectedBrand.displayName]
+                ) { result in
+                    switch result {
+                    case .success(let resourcePath):
+                        checkHyperpayStatus(resourcePath: resourcePath)
+                    case .failure(let error):
+                        orderViewModel.errorMessage = error.localizedDescription
+                        orderViewModel.isLoading = false
+                    }
+                    hyperPaymentViewModel.isShowingCheckout = false
+                }
             }
         }
-//        .fullScreenCover(isPresented: $showTamaraPayment) {
-//            if let tamaraViewModel = tamaraViewModel {
-//                VStack {
-//                    HStack {
-//                        Spacer()
-//                        Button(action: {
-//                            showTamaraPayment = false
-//                        }) {
-//                            Image(systemName: "xmark")
-//                                .padding()
-//                        }
-//                    }
-//
-//                    TamaraWebView(viewModel: tamaraViewModel)
-//                        .onReceive(tamaraViewModel.$result) { result in
-//                            guard let result = result else { return }
-//                            orderViewModel.isLoading = false
-//                            showTamaraPayment = false
-//                            
-//                            switch result {
-//                            case .success:
-//                                addOrder()
-//                            case .failure:
-//                                orderViewModel.errorMessage = "فشلت عملية الدفع"
-//                            case .cancelled:
-//                                orderViewModel.errorMessage = "تم إلغاء عملية الدفع"
-//                            case .notification:
-//                                print("تم استلام إشعار خارجي من تمارا")
-//                            }
-//                        }
-//                }
-//            }
-//        }
         .fullScreenCover(isPresented: $showTamaraPayment) {
             if let url = URL(string: checkoutUrl) {
                 SafariView(url: url) { redirectedURL in
@@ -279,51 +321,6 @@ struct CheckoutView: View {
                 }
             }
         }
-
-
-//        .fullScreenCover(isPresented: $showTamaraPayment) {
-//            let merchantURL = TamaraMerchantURL(
-//                success: "tamara://checkout/success",
-//                failure: "tamara://checkout/failure",
-//                cancel: "tamara://checkout/cancel",
-//                notification: "tamara://checkout/notification"
-//            )
-//
-//            let tamaraViewModel = TamaraSDKCheckoutSwiftUIViewModel(
-//                url: checkoutUrl,
-//                merchantURL: merchantURL
-//            )
-//
-//            VStack {
-//                VStack(alignment: .leading) {
-//                    HStack {
-//                        Spacer()
-//                        Button {
-//                            showTamaraPayment = false
-//                        } label: {
-//                            Image(systemName: "xmark")
-//                                .resizable()
-//                                .frame(width: 16, height: 16)
-//                                .foregroundColor(Color.gray)
-//                                .padding(10)
-//                        }
-//                    }
-//                    .padding()
-//                    Divider()
-//                }
-//
-//                TamaraSDKCheckoutSwiftUI(tamaraViewModel)
-//                    .onReceive(tamaraViewModel.$successDirection) { _ in
-//                        print("uuuu \(self.checkoutUrl)")
-//                        showTamaraPayment = false
-//                        addOrder()
-//                    }
-//                    .onReceive(tamaraViewModel.$failedDirection) { _ in
-//                        showTamaraPayment = false
-//                    }
-//                    .onReceive(tamaraViewModel.$finishLoadingHandler) { _ in }
-//            }
-//        }
         .onAppear {
             userViewModel.getAddressByType(type: servicePlace.rawValue)
             cartViewModel.cartTotal {
@@ -336,6 +333,20 @@ struct CheckoutView: View {
         }
     }
     
+    func checkHyperpayStatus(resourcePath: String) {
+        hyperPaymentViewModel.checkPaymentStatus(
+            hyperpayId: resourcePath,
+            brandType: selectedBrand.rawValue
+        ) { status, response in
+            if status {
+                addOrder()
+            } else {
+                orderViewModel.errorMessage = hyperPaymentViewModel.errorMessage ?? "فشلت عملية الدفع"
+            }
+            orderViewModel.isLoading = false
+        }
+    }
+
     private func handleTamaraRedirect(url: URL) {
         let urlStr = url.absoluteString
         showTamaraPayment = false
@@ -350,6 +361,13 @@ struct CheckoutView: View {
 
         // بغض النظر عن الحالة، أغلق الفيو
         showTamaraPayment = false
+    }
+    
+    // لا تكتب أي import خاص بالمكتبة
+
+    func testPayment() {
+        let provider = OPPPaymentProvider(mode: .test)
+        print("provider: \(provider)")
     }
 }
 
@@ -399,30 +417,30 @@ struct ProductSummarySection: View {
     }
 }
 
-struct PaymentInformationSection: View {
-    @Binding var payCash: Bool
-    @Binding var payMada: Bool
-    @Binding var payTamara: Bool
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            Text(LocalizedStringKey.paymentMethod)
-                .customFont(weight: .bold, size: 15)
-                .foregroundColor(.black121212())
-
-            HStack {
-//                CheckboxButton(title: LocalizedStringKey.payCash, isChecked: $payCash, other1: $payMada, other2: $payTamara)
+//struct PaymentInformationSection: View {
+//    @Binding var payCash: Bool
+//    @Binding var payMada: Bool
+//    @Binding var payTamara: Bool
+//
+//    var body: some View {
+//        VStack(alignment: .leading, spacing: 10) {
+//            Text(LocalizedStringKey.paymentMethod)
+//                .customFont(weight: .bold, size: 15)
+//                .foregroundColor(.black121212())
+//
+//            HStack {
+////                CheckboxButton(title: LocalizedStringKey.payCash, isChecked: $payCash, other1: $payMada, other2: $payTamara)
+////                Spacer()
+//                CheckboxButton(title: LocalizedStringKey.payMada, isChecked: $payMada, other1: $payCash, other2: $payTamara)
 //                Spacer()
-                CheckboxButton(title: LocalizedStringKey.payMada, isChecked: $payMada, other1: $payCash, other2: $payTamara)
-                Spacer()
-                CheckboxButton(title: LocalizedStringKey.payTamara, isChecked: $payTamara, other1: $payCash, other2: $payMada)
-            }
-        }
-        .padding()
-        .background(Color.gray.opacity(0.1))
-        .cornerRadius(10)
-    }
-}
+//                CheckboxButton(title: LocalizedStringKey.payTamara, isChecked: $payTamara, other1: $payCash, other2: $payMada)
+//            }
+//        }
+//        .padding()
+//        .background(Color.gray.opacity(0.1))
+//        .cornerRadius(10)
+//    }
+//}
 
 struct CheckboxButton: View {
     let title: String
@@ -657,6 +675,15 @@ struct AddressSelectionView: View {
 }
 
 extension CheckoutView {
+    var paymentTypeValue: String {
+        switch selectedPayment {
+        case .hyperpay, .tamara:
+            return "online"
+        case .cash:
+            return "cash"
+        }
+    }
+
     func addOrder() {
         let validation = validateAddress(purchaseType: selectedPurchaseType, selectedAddress: selectedAddress, region: region)
 
@@ -670,7 +697,7 @@ extension CheckoutView {
         // Prepare parameters dictionary
         var params: [String: Any] = [
             "couponCode": coupon,
-            "PaymentType": payCash ? "cash" : "online",
+            "PaymentType": paymentTypeValue,
             "dt_date": formattedDate,
             "dt_time": formattedTime,
             "is_address_book": isAddressBook,
@@ -849,15 +876,26 @@ struct NotesView: View {
 }
 
 extension CheckoutView {
-    func startPayment(amount: Double) {
+    func startHyperpayPayment(amount: Double) {
         let validation = validateAddress(purchaseType: selectedPurchaseType, selectedAddress: selectedAddress, region: region)
 
         handleValidationResult(validation)
         guard validation == .valid else { return }
 
-        orderViewModel.isLoading = true
-        paymentViewModel.updateAmount(amount.toString())
-        paymentViewModel.startPayment()
+        hyperPaymentViewModel.requestCheckoutId(
+            amount: amount,
+            brandType: selectedBrand.rawValue // أهم شي هذا!
+        ) { checkoutId in
+            if let id = checkoutId {
+                print("checkoutId sent to SDK: \(id)")
+                print("brands sent: \(selectedBrand.displayName)")
+                print("token: \(UserSettings.shared.token)")
+                currentHyperpayId = id
+                hyperPaymentViewModel.isShowingCheckout = true
+            } else {
+                orderViewModel.errorMessage = "تعذر بدء عملية الدفع"
+            }
+        }
     }
 }
 

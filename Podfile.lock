@@ -1,5 +1,10 @@
 PODS:
   - Alamofire (5.10.2)
+  - CommonDataModelsKit-iOS (1.0.145):
+    - SwiftyRSA
+    - TapAdditionsKitV2
+    - TapCardVlidatorKit-iOS
+    - TapKeychainV2
   - EditableTextInsetsTextFieldV2 (0.0.3):
     - TapAdditionsKitV2
   - goSellSDK (2.3.46):
@@ -31,6 +36,10 @@ PODS:
     - Moya
   - TapAdditionsKitV2 (0.0.17):
     - TapSwiftFixesV2
+  - TapApplePayKit-iOS (1.0.30):
+    - CommonDataModelsKit-iOS
+    - TapApplicationV2
+    - TapNetworkKit-iOS
   - TapApplicationV2 (0.0.3):
     - TapAdditionsKitV2
   - TapBundleLocalizationV2 (0.0.3)
@@ -42,6 +51,12 @@ PODS:
   - TapGLKitV2 (0.0.3):
     - TapAdditionsKitV2
   - TapKeychainV2 (1.0.2)
+  - TapNetworkKit-iOS (1.0.14):
+    - CommonDataModelsKit-iOS
+    - SwiftyRSA
+    - TapAdditionsKitV2
+    - TapApplicationV2
+    - TapCardVlidatorKit-iOS
   - TapNetworkManagerV2 (0.0.6):
     - TapAdditionsKitV2
   - TapNibViewV2 (0.0.3):
@@ -66,16 +81,19 @@ PODS:
 DEPENDENCIES:
   - goSellSDK
   - TamaraSDK
+  - TapApplePayKit-iOS
 
 SPEC REPOS:
   trunk:
     - Alamofire
+    - CommonDataModelsKit-iOS
     - EditableTextInsetsTextFieldV2
     - goSellSDK
     - Moya
     - SwiftyRSA
     - TamaraSDK
     - TapAdditionsKitV2
+    - TapApplePayKit-iOS
     - TapApplicationV2
     - TapBundleLocalizationV2
     - TapCardVlidatorKit-iOS
@@ -83,6 +101,7 @@ SPEC REPOS:
     - TapFontsKitV2
     - TapGLKitV2
     - TapKeychainV2
+    - TapNetworkKit-iOS
     - TapNetworkManagerV2
     - TapNibViewV2
     - TapResponderChainInputViewV2
@@ -92,12 +111,14 @@ SPEC REPOS:
 
 SPEC CHECKSUMS:
   Alamofire: 7193b3b92c74a07f85569e1a6c4f4237291e7496
+  CommonDataModelsKit-iOS: 1951f44a3a707c53b71305dfb07abbd9d2d11b54
   EditableTextInsetsTextFieldV2: 4734d3376d6b1ebe95afc824da5caa1c37b228a3
   goSellSDK: 8b174b8a9f3fe57a940f73608279667f8a58a7d0
   Moya: 138f0573e53411fb3dc17016add0b748dfbd78ee
   SwiftyRSA: 8c6dd1ea7db1b8dc4fb517a202f88bb1354bc2c6
   TamaraSDK: dd5935511c1754aacd6bb0392262233ccefe5318
   TapAdditionsKitV2: 0bb217062d4df1db86b339e7693283b293b0ccff
+  TapApplePayKit-iOS: 0e9fca8bc17e3c5db415043df34a6fff54e697fb
   TapApplicationV2: a5e256888515be65654f048605bfb871a5ad53a9
   TapBundleLocalizationV2: 282e5a0ebfd08b502ec2ba22dde8da2de7340110
   TapCardVlidatorKit-iOS: 05d3e644dddd6aa52dd95cc85a2c41f7ce0ba2f9
@@ -105,6 +126,7 @@ SPEC CHECKSUMS:
   TapFontsKitV2: 2b11cd69c4f8c4485376c92a1982387a5184ca13
   TapGLKitV2: 5e5857e73e5a516807ec9c388f5c028de7616290
   TapKeychainV2: aaa08a208f3e7aea042e2caf1b6b5abb39baecdc
+  TapNetworkKit-iOS: 92c8c7feae384dc2595f8f270853ee3cf8ea3380
   TapNetworkManagerV2: 73a80838e7a30bd05e1030ff4b751421f14774a6
   TapNibViewV2: a6df9bfe0a36dfa9039b8200f2921dd5f66874c5
   TapResponderChainInputViewV2: d62b22fd9f1e6e9a195e4960c5679805a83ed44c
@@ -112,6 +134,6 @@ SPEC CHECKSUMS:
   TapSwiftFixesV2: ea726f752b6259d9e44624039fd6bad94b2a8633
   TapVisualEffectViewV2: bc2b3b718acc3c1298ce7d21985633941d986345
 
-PODFILE CHECKSUM: c915a8ab82a94b4a7c541e0f6bcbd1727583e7e1
+PODFILE CHECKSUM: 3bf17f45926b5dacdaea5a718ecae34dacd338b1
 
 COCOAPODS: 1.16.2

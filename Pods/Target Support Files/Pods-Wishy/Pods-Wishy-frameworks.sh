@@ -177,11 +177,13 @@ code_sign_if_enabled() {
 
 if [[ "$CONFIGURATION" == "Debug" ]]; then
   install_framework "${BUILT_PRODUCTS_DIR}/Alamofire/Alamofire.framework"
+  install_framework "${BUILT_PRODUCTS_DIR}/CommonDataModelsKit-iOS/CommonDataModelsKit_iOS.framework"
   install_framework "${BUILT_PRODUCTS_DIR}/EditableTextInsetsTextFieldV2/EditableTextInsetsTextFieldV2.framework"
   install_framework "${BUILT_PRODUCTS_DIR}/Moya/Moya.framework"
   install_framework "${BUILT_PRODUCTS_DIR}/SwiftyRSA/SwiftyRSA.framework"
   install_framework "${BUILT_PRODUCTS_DIR}/TamaraSDK/TamaraSDK.framework"
   install_framework "${BUILT_PRODUCTS_DIR}/TapAdditionsKitV2/TapAdditionsKitV2.framework"
+  install_framework "${BUILT_PRODUCTS_DIR}/TapApplePayKit-iOS/TapApplePayKit_iOS.framework"
   install_framework "${BUILT_PRODUCTS_DIR}/TapApplicationV2/TapApplicationV2.framework"
   install_framework "${BUILT_PRODUCTS_DIR}/TapBundleLocalizationV2/TapBundleLocalizationV2.framework"
   install_framework "${BUILT_PRODUCTS_DIR}/TapCardVlidatorKit-iOS/TapCardVlidatorKit_iOS.framework"
@@ -189,6 +191,7 @@ if [[ "$CONFIGURATION" == "Debug" ]]; then
   install_framework "${BUILT_PRODUCTS_DIR}/TapFontsKitV2/TapFontsKitV2.framework"
   install_framework "${BUILT_PRODUCTS_DIR}/TapGLKitV2/TapGLKitV2.framework"
   install_framework "${BUILT_PRODUCTS_DIR}/TapKeychainV2/TapKeychainV2.framework"
+  install_framework "${BUILT_PRODUCTS_DIR}/TapNetworkKit-iOS/TapNetworkKit_iOS.framework"
   install_framework "${BUILT_PRODUCTS_DIR}/TapNetworkManagerV2/TapNetworkManagerV2.framework"
   install_framework "${BUILT_PRODUCTS_DIR}/TapNibViewV2/TapNibViewV2.framework"
   install_framework "${BUILT_PRODUCTS_DIR}/TapResponderChainInputViewV2/TapResponderChainInputViewV2.framework"
@@ -199,11 +202,13 @@ if [[ "$CONFIGURATION" == "Debug" ]]; then
 fi
 if [[ "$CONFIGURATION" == "Release" ]]; then
   install_framework "${BUILT_PRODUCTS_DIR}/Alamofire/Alamofire.framework"
+  install_framework "${BUILT_PRODUCTS_DIR}/CommonDataModelsKit-iOS/CommonDataModelsKit_iOS.framework"
   install_framework "${BUILT_PRODUCTS_DIR}/EditableTextInsetsTextFieldV2/EditableTextInsetsTextFieldV2.framework"
   install_framework "${BUILT_PRODUCTS_DIR}/Moya/Moya.framework"
   install_framework "${BUILT_PRODUCTS_DIR}/SwiftyRSA/SwiftyRSA.framework"
   install_framework "${BUILT_PRODUCTS_DIR}/TamaraSDK/TamaraSDK.framework"
   install_framework "${BUILT_PRODUCTS_DIR}/TapAdditionsKitV2/TapAdditionsKitV2.framework"
+  install_framework "${BUILT_PRODUCTS_DIR}/TapApplePayKit-iOS/TapApplePayKit_iOS.framework"
   install_framework "${BUILT_PRODUCTS_DIR}/TapApplicationV2/TapApplicationV2.framework"
   install_framework "${BUILT_PRODUCTS_DIR}/TapBundleLocalizationV2/TapBundleLocalizationV2.framework"
   install_framework "${BUILT_PRODUCTS_DIR}/TapCardVlidatorKit-iOS/TapCardVlidatorKit_iOS.framework"
@@ -211,6 +216,7 @@ if [[ "$CONFIGURATION" == "Release" ]]; then
   install_framework "${BUILT_PRODUCTS_DIR}/TapFontsKitV2/TapFontsKitV2.framework"
   install_framework "${BUILT_PRODUCTS_DIR}/TapGLKitV2/TapGLKitV2.framework"
   install_framework "${BUILT_PRODUCTS_DIR}/TapKeychainV2/TapKeychainV2.framework"
+  install_framework "${BUILT_PRODUCTS_DIR}/TapNetworkKit-iOS/TapNetworkKit_iOS.framework"
   install_framework "${BUILT_PRODUCTS_DIR}/TapNetworkManagerV2/TapNetworkManagerV2.framework"
   install_framework "${BUILT_PRODUCTS_DIR}/TapNibViewV2/TapNibViewV2.framework"
   install_framework "${BUILT_PRODUCTS_DIR}/TapResponderChainInputViewV2/TapResponderChainInputViewV2.framework"

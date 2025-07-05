@@ -419,8 +419,10 @@ class WishesViewModel: ObservableObject {
         isLoading = true
         errorMessage = nil
         let endpoint = DataProvider.Endpoint.payWish(id: id, params: params, token: token)
-
+print("sss \(endpoint)")
         DataProvider.shared.request(endpoint: endpoint, responseType: SingleAPIResponse<AddWish>.self) { [weak self] result in
+            print("sss22 \(result)")
+
             self?.isLoading = false
             switch result {
             case .success(let response):

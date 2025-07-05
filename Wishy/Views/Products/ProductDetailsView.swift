@@ -33,6 +33,15 @@ struct ProductDetailsView: View {
     @State private var checkoutUrl = ""
     @State var tamaraViewModel: TamaraWebViewModel? = nil
     @StateObject private var paymentViewModel = PaymentViewModel()
+    // Hyperpay
+    @StateObject private var hyperPaymentViewModel = HyperPaymentViewModel()
+    @State private var selectedBrand: HyperpayBrand = .mada
+    @State private var showBrandSheet = false
+    @State private var currentHyperpayId: String?
+
+    // اختيار وسيلة الدفع
+    @State private var payHyper: Bool = true
+    @State private var payTamara: Bool = false
 
     var body: some View {
         VStack {
@@ -129,50 +138,129 @@ struct ProductDetailsView: View {
             $0.type(.floater()).position(.bottom).animation(.spring()).closeOnTapOutside(true).backgroundColor(Color.black.opacity(0.4))
         }
         .popup(isPresented: $showPaymentOptions) {
-            VStack(spacing: 20) {
-                Text("اختر بوابة الدفع")
-                    .customFont(weight: .bold, size: 18)
-
-                paymentButton(icon: "creditcard", label: "مدى - ابل بي") {
-                    showPaymentOptions = false
-                    startMadaPayment(for: selectedGroupId, isShare: selectedIsShare)
+            ZStack(alignment: .topLeading) {
+                VStack(spacing: 28) {
+                    // زر إغلاق دائري أعلى اليمين
+                    HStack {
+                        Spacer()
+                        Button(action: { showPaymentOptions = false }) {
+                            Image(systemName: "xmark")
+                                .foregroundColor(.white)
+                                .padding(8)
+                                .background(Color.gray.opacity(0.7))
+                                .clipShape(Circle())
+                        }
+                    }
+                    .padding(.top, 6)
+                    .padding(.trailing, 6)
+                    
+                    // عنوان رئيسي
+                    Text("اختر وسيلة الدفع")
+                        .customFont(weight: .bold, size: 20)
+                        .foregroundColor(.primaryBlack())
+                        .padding(.bottom, -8)
+                    
+                    // خيارات الدفع
+                    HStack(spacing: 20) {
+                        paymentChoiceButton(icon: "creditcard", title: "هايبر باي", isActive: payHyper) {
+                            payHyper = true
+                            payTamara = false
+                        }
+                        paymentChoiceButton(icon: "cart", title: "تمارا", isActive: payTamara) {
+                            payHyper = false
+                            payTamara = true
+                        }
+                    }
+                    .padding(.vertical, 6)
+                    
+                    // اختيار نوع البطاقة
+                    if payHyper {
+                        VStack(alignment: .leading, spacing: 12) {
+                            Text("نوع البطاقة")
+                                .font(.system(size: 14, weight: .semibold))
+                                .foregroundColor(.primaryBlack())
+                            
+                            Button {
+                                showBrandSheet = true
+                            } label: {
+                                HStack {
+                                    Image(systemName: selectedBrand.iconName) // استخدم iconName حسب براندك
+                                        .frame(width: 24, height: 24)
+                                    Text(selectedBrand.displayName)
+                                        .foregroundColor(.primary)
+                                    Spacer()
+                                    Image(systemName: "chevron.down")
+                                        .foregroundColor(.gray)
+                                }
+                                .padding(12)
+                                .background(Color.gray.opacity(0.08))
+                                .cornerRadius(12)
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 12)
+                                        .stroke(Color.primary.opacity(0.15), lineWidth: 1)
+                                )
+                            }
+                            .buttonStyle(PlainButtonStyle())
+                            
+                            Text("يمكنك اختيار مدى، فيزا، ماستر، أو أبل باي")
+                                .font(.footnote)
+                                .foregroundColor(.gray)
+                                .padding(.top, 2)
+                        }
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                    }
+                    
+                    // زر الدفع
+                    Button {
+                        if payHyper {
+                            startHyperpayPayment(for: selectedGroupId, isShare: selectedIsShare)
+                        } else if payTamara {
+                            startTamaraCheckout(for: selectedGroupId, isShare: selectedIsShare)
+                        }
+                        showPaymentOptions = false
+                    } label: {
+                        Text("الاستمرار للدفع")
+                            .font(.system(size: 17, weight: .bold))
+                            .frame(maxWidth: .infinity)
+                    }
+                    .buttonStyle(GradientPrimaryButton(fontSize: 17, fontWeight: .bold, background: Color.primaryGradientColor(), foreground: .white, height: 50, radius: 14))
+                    .padding(.vertical, 10)
                 }
-
-                paymentButton(icon: "cart", label: "تمارا") {
-                    showPaymentOptions = false
-                    startTamaraCheckout(for: selectedGroupId, isShare: selectedIsShare)
-                }
-
-                Button("إلغاء") {
-                    showPaymentOptions = false
-                }
-                .foregroundColor(.red)
+                .padding(.top, 6)
+                .padding(.horizontal, 22)
+                .padding(.bottom, 18)
+                .background(
+                    RoundedRectangle(cornerRadius: 28)
+                        .fill(Color.white)
+                        .shadow(color: Color.black.opacity(0.13), radius: 14, x: 0, y: 7)
+                )
             }
-            .padding()
-            .frame(maxWidth: .infinity)
-            .background(Color.white)
-            .cornerRadius(20)
         } customize: {
-            $0
-                .type(.toast)
-                .position(.bottom)
-                .animation(.spring())
-                .closeOnTapOutside(true)
-                .backgroundColor(Color.black.opacity(0.4))
-                .useKeyboardSafeArea(true)
+            $0.type(.toast)
+              .position(.bottom)
+              .animation(.spring())
+              .closeOnTapOutside(true)
+              .backgroundColor(Color.black.opacity(0.27))
+              .useKeyboardSafeArea(true)
         }
-        .onChange(of: paymentViewModel.paymentStatus) { status in
-            guard let status = status else { return }
-
-            orderViewModel.isLoading = false
-
-            switch status {
-            case .success:
-                submitWish(group_id: selectedGroupId, type: "public", isShare: selectedIsShare)
-            case .failed(let message):
-                orderViewModel.errorMessage = message
-            case .cancelled:
-                orderViewModel.errorMessage = "تم إلغاء عملية الدفع"
+        .sheet(isPresented: $showBrandSheet) {
+            BrandSheet(selectedBrand: $selectedBrand, showBrandSheet: $showBrandSheet)
+        }
+        .fullScreenCover(isPresented: $hyperPaymentViewModel.isShowingCheckout) {
+            if let checkoutId = hyperPaymentViewModel.checkoutId {
+                HyperpayCheckoutView(
+                    checkoutId: checkoutId,
+                    paymentBrands: [selectedBrand.displayName]
+                ) { result in
+                    switch result {
+                    case .success(let resourcePath):
+                        checkHyperpayStatus(resourcePath: checkoutId)
+                    case .failure(let error):
+                        orderViewModel.errorMessage = error.localizedDescription
+                        orderViewModel.isLoading = false
+                    }
+                    hyperPaymentViewModel.isShowingCheckout = false
+                }
             }
         }
         .fullScreenCover(isPresented: $showTamaraPayment) {
@@ -182,24 +270,34 @@ struct ProductDetailsView: View {
                 }
             }
         }
-        .fullScreenCover(isPresented: $showTamaraPayment) {
-            if let url = URL(string: checkoutUrl) {
-                SafariView(url: url) { redirectedURL in
-                    showTamaraPayment = false
-                    let result = redirectedURL.absoluteString
-                    if result.contains("success") {
-                        submitWish(group_id: selectedGroupId, type: "public", isShare: selectedIsShare)
-                    } else if result.contains("failure") {
-                        viewModel.errorMessage = "فشلت عملية الدفع عبر تمارا"
-                    }
-                }
-            }
-        }
         .overlay(alertObservers)
         .onAppear {
             getDetails()
-            GoSellSDK.mode = .production
         }
+    }
+    
+    @ViewBuilder
+    func paymentChoiceButton(icon: String, title: String, isActive: Bool, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            HStack(spacing: 8) {
+                Image(systemName: icon)
+                    .foregroundColor(isActive ? .white : .gray)
+                    .frame(width: 22, height: 22)
+                Text(title)
+                    .font(.system(size: 16, weight: .bold))
+                    .foregroundColor(isActive ? .white : .black)
+            }
+            .padding(.horizontal, 20)
+            .padding(.vertical, 12)
+            .background(isActive ? Color.primary : Color.gray.opacity(0.09))
+            .cornerRadius(12)
+            .overlay(
+                RoundedRectangle(cornerRadius: 12)
+                    .stroke(isActive ? Color.primary : Color.gray.opacity(0.3), lineWidth: isActive ? 0 : 1)
+            )
+            .shadow(color: isActive ? Color.primary.opacity(0.10) : Color.clear, radius: 5)
+        }
+        .buttonStyle(PlainButtonStyle())
     }
 
     var productImageView: some View {
@@ -361,8 +459,12 @@ struct ProductDetailsView: View {
             "variation_name": selectedName,
             "variation_sku": selectedSku
         ]
+        
+        print("ssss \(params)")
+
         cartViewModel.addToCart(params: params, onsuccess: {
             // handle success
+            print("222")
             DispatchQueue.main.async {
                 self.showAddToCartPopup = true
             }
@@ -409,14 +511,38 @@ struct ProductDetailsView: View {
         }
     }
 
-    func startMadaPayment(for groupId: String, isShare: Bool) {
+    func startHyperpayPayment(for groupId: String, isShare: Bool) {
         let amount = exploreCost
         orderViewModel.isLoading = true
         selectedGroupId = groupId
         selectedIsShare = isShare
+        hyperPaymentViewModel.requestCheckoutId(
+            amount: amount,
+            brandType: selectedBrand.dbValue
+        ) { checkoutId in
+            if let id = checkoutId {
+                currentHyperpayId = id
+                hyperPaymentViewModel.checkoutId = id
+                hyperPaymentViewModel.isShowingCheckout = true
+            } else {
+                orderViewModel.errorMessage = "فشل في بدء عملية الدفع"
+                orderViewModel.isLoading = false
+            }
+        }
+    }
 
-        paymentViewModel.updateAmount(amount.toString())
-        paymentViewModel.startPayment()
+    func checkHyperpayStatus(resourcePath: String) {
+        hyperPaymentViewModel.checkPaymentStatus(
+            hyperpayId: resourcePath,
+            brandType: selectedBrand.dbValue
+        ) { status, response in
+            orderViewModel.isLoading = false
+            if status {
+                submitWish(group_id: selectedGroupId, type: "public", isShare: selectedIsShare)
+            } else {
+                orderViewModel.errorMessage = "فشلت عملية الدفع"
+            }
+        }
     }
 
     func startTamaraCheckout(for groupId: String, isShare: Bool) {

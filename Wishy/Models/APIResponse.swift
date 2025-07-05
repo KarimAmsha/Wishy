@@ -36,6 +36,21 @@ struct SingleAPIResponse<T: Codable>: Codable {
     let items: T?
 }
 
+struct AlternateErrorResponse: Codable {
+    let status: Bool?
+    let statusCode: Int?
+    let error: String?
+    let message: String?
+    let code: Int?
+    let items: String? // أحياناً يكون نص خطأ هنا
+}
+
+struct GenericErrorResponse: Decodable {
+    let statusCode: Int?
+    let error: String?
+    let message: String?
+}
+
 struct BaseCustomStatusAPIResponse<T: Codable>: Codable {
     let status_code: Int
     let status: Bool

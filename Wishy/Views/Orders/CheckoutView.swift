@@ -310,8 +310,6 @@ struct CheckoutView: View {
             }
             cartViewModel.getCartItems()
             locationManager2.startUpdatingLocation()
-            
-            GoSellSDK.mode = .production
         }
     }
     

@@ -1,9 +1,4 @@
-//
-//  RetailPaymentView.swift
-//  Wishy
-//
-//  Created by Karim Amsha on 1.05.2024.
-//
+// RetailPaymentView.swift
 
 import SwiftUI
 import goSellSDK
@@ -14,8 +9,12 @@ struct RetailPaymentView: View {
     @State var total = ""
     @ObservedObject var wishesViewModel = WishesViewModel(errorHandling: ErrorHandling())
     let wishId: String?
-    @StateObject private var paymentViewModel = PaymentViewModel()
-    @State private var payMada: Bool = true
+    @StateObject private var hyperPaymentViewModel = HyperPaymentViewModel()
+    @State private var selectedBrand: HyperpayBrand = .mada
+    @State private var showBrandSheet = false
+    @State private var currentHyperpayId: String?
+
+    @State private var payHyper: Bool = true
     @State private var payTamara: Bool = false
     @StateObject var orderViewModel = OrderViewModel(errorHandling: ErrorHandling())
     @State private var showTamaraPayment = false
@@ -26,14 +25,36 @@ struct RetailPaymentView: View {
         VStack {
             Image("ic_money")
                 .padding(.top, 80)
-            
-            PaymentOptionsSection(payMada: $payMada, payTamara: $payTamara)
+
+            PaymentOptionsSection(payHyper: $payHyper, payTamara: $payTamara)
                 .padding(.bottom, 16)
+
+            if payHyper {
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("نوع البطاقة")
+                        .font(.subheadline)
+                    Button {
+                        showBrandSheet = true
+                    } label: {
+                        HStack {
+                            Text(selectedBrand.displayName)
+                                .foregroundColor(.primary)
+                            Spacer()
+                            Image(systemName: "chevron.down")
+                                .foregroundColor(.gray)
+                        }
+                        .padding()
+                        .background(Color.gray.opacity(0.1))
+                        .cornerRadius(10)
+                    }
+                }
+                .padding(.bottom, 10)
+            }
 
             Text("اكتب القيمة بالريال السعودي")
                 .customFont(weight: .bold, size: 16)
                 .foregroundColor(.primaryBlack())
-            
+
             VStack(alignment: .leading) {
                 TextField(LocalizedStringKey.sar, text: $total)
                     .placeholder(when: total.isEmpty) {
@@ -51,7 +72,7 @@ struct RetailPaymentView: View {
             .foregroundColor(.black222020())
 
             Spacer()
-            
+
             if orderViewModel.isLoading {
                 LoadingView()
             }
@@ -64,8 +85,8 @@ struct RetailPaymentView: View {
 
                 let amount = total.toDouble() ?? 0.0
 
-                if payMada {
-                    startPayment(amount: amount)
+                if payHyper {
+                    startHyperpayPayment(amount: amount)
                 } else if payTamara {
                     startTamaraCheckout(amount: amount)
                 }
@@ -93,36 +114,26 @@ struct RetailPaymentView: View {
                 }
             }
         }
-        .overlay(
-            MessageAlertObserverView(
-                message: $orderViewModel.errorMessage,
-                alertType: .constant(.error)
-            )
-        )
-        .overlay(
-            MessageAlertObserverView(
-                message: $wishesViewModel.errorMessage,
-                alertType: .constant(.error)
-            )
-        )
-        .overlay(
-            MessageAlertObserverView(
-                message: $paymentViewModel.errorMessage,
-                alertType: .constant(.error)
-            )
-        )
-        .onChange(of: paymentViewModel.paymentStatus) { status in
-            guard let status = status else { return }
-
-            wishesViewModel.isLoading = false
-
-            switch status {
-            case .success:
-                payWish()
-            case .failed(let message):
-                paymentViewModel.errorMessage = message
-            case .cancelled:
-                paymentViewModel.errorMessage = "تم إلغاء عملية الدفع"
+        .overlay(MessageAlertObserverView(message: $orderViewModel.errorMessage, alertType: .constant(.error)))
+        .overlay(MessageAlertObserverView(message: $wishesViewModel.errorMessage, alertType: .constant(.error)))
+        .sheet(isPresented: $showBrandSheet) {
+            BrandSheet(selectedBrand: $selectedBrand, showBrandSheet: $showBrandSheet)
+        }
+        .fullScreenCover(isPresented: $hyperPaymentViewModel.isShowingCheckout) {
+            if let checkoutId = hyperPaymentViewModel.checkoutId {
+                HyperpayCheckoutView(
+                    checkoutId: checkoutId,
+                    paymentBrands: [selectedBrand.displayName]
+                ) { result in
+                    switch result {
+                    case .success(let resourcePath):
+                        checkHyperpayStatus(resourcePath: checkoutId)
+                    case .failure(let error):
+                        orderViewModel.errorMessage = error.localizedDescription
+                        orderViewModel.isLoading = false
+                    }
+                    hyperPaymentViewModel.isShowingCheckout = false
+                }
             }
         }
         .fullScreenCover(isPresented: $showTamaraPayment) {
@@ -133,8 +144,6 @@ struct RetailPaymentView: View {
             }
         }
         .onAppear {
-            GoSellSDK.mode = .production
-            
             laodWishData()
         }
     }
@@ -150,25 +159,44 @@ struct RetailPaymentView: View {
         } else if urlStr.contains("wishy.sa/tamara/cancel") {
             orderViewModel.errorMessage = "تم إلغاء عملية الدفع"
         }
-
-        // بغض النظر عن الحالة، أغلق الفيو
-        showTamaraPayment = false
     }
 
     func payWish() {
-        let params: [String: Any] = [
-            "total": total
-        ]
-
+        let params: [String: Any] = ["total": total]
         wishesViewModel.payWish(id: wishId ?? "", params: params) {
             appRouter.navigate(to: .paymentSuccess)
         }
     }
 
-    func startPayment(amount: Double) {
+    func startHyperpayPayment(amount: Double) {
         orderViewModel.isLoading = true
-        paymentViewModel.updateAmount(amount.toString())
-        paymentViewModel.startPayment()
+        hyperPaymentViewModel.requestCheckoutId(
+            amount: amount,
+            brandType: selectedBrand.dbValue
+        ) { checkoutId in
+            if let id = checkoutId {
+                currentHyperpayId = id
+                hyperPaymentViewModel.checkoutId = id
+                hyperPaymentViewModel.isShowingCheckout = true
+            } else {
+                orderViewModel.errorMessage = "فشل في بدء عملية الدفع"
+                orderViewModel.isLoading = false
+            }
+        }
+    }
+
+    func checkHyperpayStatus(resourcePath: String) {
+        hyperPaymentViewModel.checkPaymentStatus(
+            hyperpayId: resourcePath,
+            brandType: selectedBrand.dbValue
+        ) { status, response in
+            orderViewModel.isLoading = false
+            if status {
+                payWish()
+            } else {
+                orderViewModel.errorMessage = "فشلت عملية الدفع"
+            }
+        }
     }
 
     func startTamaraCheckout(amount: Double) {
@@ -190,9 +218,6 @@ struct RetailPaymentView: View {
         orderViewModel.tamaraCheckout(params: tamaraBody) {
             let url = orderViewModel.tamaraCheckout?.checkout_url ?? ""
             self.checkoutUrl = url
-//            self.checkoutUrl = "https://raw.githack.com/KarimAmsha/my-project/main/index.html"
-
-            // Initialize the Tamara view model with the new URL and merchantURL
             self.tamaraViewModel = TamaraWebViewModel(
                 url: self.checkoutUrl,
                 merchantURL: TamaraMerchantURL(
@@ -202,11 +227,9 @@ struct RetailPaymentView: View {
                     notification: "https://wishy.sa/tamara/cancel"
                 )
             )
-
             showTamaraPayment.toggle()
         }
     }
-
 }
 
 extension RetailPaymentView {
@@ -214,8 +237,9 @@ extension RetailPaymentView {
         wishesViewModel.getWish(id: wishId ?? "")
     }
 }
+
 struct PaymentOptionsSection: View {
-    @Binding var payMada: Bool
+    @Binding var payHyper: Bool
     @Binding var payTamara: Bool
 
     var body: some View {
@@ -225,8 +249,8 @@ struct PaymentOptionsSection: View {
                 .foregroundColor(.black121212())
 
             HStack(spacing: 20) {
-                RetailCheckboxButton(title: "مدى", isChecked: $payMada, other: $payTamara)
-                RetailCheckboxButton(title: "تمارا", isChecked: $payTamara, other: $payMada)
+                RetailCheckboxButton(title: "هايبر بي", isChecked: $payHyper, other: $payTamara)
+                RetailCheckboxButton(title: "تمارا", isChecked: $payTamara, other: $payHyper)
             }
         }
     }

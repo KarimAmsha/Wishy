@@ -33,10 +33,12 @@ class CartViewModel: ObservableObject {
         let endpoint = DataProvider.Endpoint.addToCart(params: params, token: token)
 
         DataProvider.shared.request(endpoint: endpoint, responseType: SingleAPIResponse<Cart>.self) { [weak self] result in
+            print("rrr \(result)")
             guard let self = self else { return }
             self.isLoading = false
             switch result {
             case .success(let response):
+                print("response response \(response)")
                 if response.status {
                     self.cart = response.items
                     self.errorMessage = nil

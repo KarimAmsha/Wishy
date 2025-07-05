@@ -6,7 +6,6 @@
 //
 
 import SwiftUI
-import goSellSDK
 
 struct AddBalanceView: View {
     @State private var coupon = ""
@@ -15,10 +14,14 @@ struct AddBalanceView: View {
     @State private var alertMessage = ""
     @Binding var showAddBalanceView: Bool
     var onsuccess: () -> Void
-    @StateObject private var paymentState = PaymentState(errorHandling: ErrorHandling())
-    @StateObject private var viewModel = PaymentViewModel()
+
     @EnvironmentObject var appRouter: AppRouter
     @StateObject private var orderViewModel = OrderViewModel(errorHandling: ErrorHandling())
+    @StateObject private var hyperPaymentViewModel = HyperPaymentViewModel()
+
+    @State private var selectedBrand: HyperpayBrand = .mada
+    @State private var currentHyperpayId: String?
+    @State private var showBrandSheet = false
 
     init(showAddBalanceView: Binding<Bool>, onsuccess: @escaping () -> Void) {
         _showAddBalanceView = showAddBalanceView
@@ -29,30 +32,39 @@ struct AddBalanceView: View {
         VStack(spacing: 20) {
             CustomTextFieldWithTitle(text: $amount, placeholder: LocalizedStringKey.amount, textColor: .black4E5556(), placeholderColor: .grayA4ACAD())
                 .keyboardType(.numberPad)
-                .disabled(paymentState.isLoading)
+                .disabled(orderViewModel.isLoading)
 
-            if let errorMessage = paymentState.errorMessage {
+            if let errorMessage = orderViewModel.errorMessage {
                 Text(errorMessage)
                     .customFont(weight: .regular, size: 14)
                     .foregroundColor(.redFF3F3F())
             }
 
-            if paymentState.isLoading {
+            VStack(alignment: .leading, spacing: 8) {
+                Text("نوع البطاقة")
+                    .font(.subheadline)
+                
+                Button {
+                    showBrandSheet = true
+                } label: {
+                    HStack {
+                        Text(selectedBrand.displayName)
+                            .foregroundColor(.primary)
+                        Spacer()
+                        Image(systemName: "chevron.down")
+                            .foregroundColor(.gray)
+                    }
+                    .padding()
+                    .background(Color.gray.opacity(0.1))
+                    .cornerRadius(10)
+                }
+            }
+            .disabled(orderViewModel.isLoading)
+
+            if orderViewModel.isLoading {
                 LoadingView()
             }
-
-//            VStack {
-//                Button("Start Payment") {
-//                    viewModel.startPayment()
-//                }
-//                .padding()
-//                .foregroundColor(.white)
-//                .background(Color.blue)
-//                .cornerRadius(10)
-//
-//                Spacer()
-//            }
-//            .padding()
+            
 
             Button {
                 checkCoupon()
@@ -60,7 +72,7 @@ struct AddBalanceView: View {
                 Text(LocalizedStringKey.send)
             }
             .buttonStyle(PrimaryButton(fontSize: 18, fontWeight: .bold, background: .primary(), foreground: .white, height: 48, radius: 12))
-            .disabled(paymentState.isLoading)
+            .disabled(orderViewModel.isLoading)
 
             Spacer()
         }
@@ -69,66 +81,93 @@ struct AddBalanceView: View {
         .alert(isPresented: $showAlert) {
             Alert(title: Text(LocalizedStringKey.error), message: Text(alertMessage), dismissButton: .default(Text(LocalizedStringKey.ok)))
         }
-        .onAppear {
-            GoSellSDK.mode = .production
+        .sheet(isPresented: $showBrandSheet) {
+            BrandSheet(selectedBrand: $selectedBrand, showBrandSheet: $showBrandSheet)
         }
         .overlay(
             MessageAlertObserverView(
-                message: $viewModel.errorMessage,
+                message: $hyperPaymentViewModel.errorMessage,
                 alertType: .constant(.error)
             )
         )
-        .onChange(of: viewModel.paymentStatus) { status in
-            guard let status = status else { return }
-
-            paymentState.isLoading = false
-
-            switch status {
-            case .success:
-                addBalance()
-            case .failed(let message):
-                viewModel.errorMessage = message
-            case .cancelled:
-                viewModel.errorMessage = "تم إلغاء عملية الدفع"
-            }
-        }
-    }
-}
-
-extension AddBalanceView {
-    private func checkCoupon() {
-
-        if coupon.isEmpty {
-            guard !amount.isEmpty else {
-                paymentState.errorMessage = LocalizedStringKey.addAccount
-                return
-            }
-            startPayment(amount: amount.toDouble() ?? 0.0)
-        } else {
-            orderViewModel.checkCoupon(params: [:]) { [self] in
-                if let finalTotal = orderViewModel.coupon?.final_total {
-                    startPayment(amount: finalTotal)
+        .fullScreenCover(isPresented: $hyperPaymentViewModel.isShowingCheckout) {
+            if let checkoutId = hyperPaymentViewModel.checkoutId {
+                HyperpayCheckoutView(
+                    checkoutId: checkoutId,
+                    paymentBrands: [selectedBrand.displayName]
+                ) { result in
+                    switch result {
+                    case .success(let resourcePath):
+                        checkHyperpayStatus(resourcePath: checkoutId)
+                    case .failure(let error):
+                        orderViewModel.errorMessage = error.localizedDescription
+                        orderViewModel.isLoading = false
+                    }
+                    hyperPaymentViewModel.isShowingCheckout = false
                 }
             }
         }
     }
-    
-    func startPayment(amount: Double) {
-        paymentState.isLoading = true
-        viewModel.updateAmount(amount.toString())
-        viewModel.startPayment()
+
+    private func checkCoupon() {
+        orderViewModel.errorMessage = nil
+
+        guard !amount.isEmpty, let amountValue = amount.toDouble(), amountValue > 0 else {
+            orderViewModel.errorMessage = LocalizedStringKey.addAccount
+            return
+        }
+
+        if coupon.isEmpty {
+            startHyperpayPayment(amount: amountValue)
+        } else {
+            orderViewModel.checkWalletCoupon(params: [:]) {
+                if let finalTotal = orderViewModel.coupon?.final_total {
+                    startHyperpayPayment(amount: finalTotal)
+                }
+            }
+        }
     }
-    
+
+    func startHyperpayPayment(amount: Double) {
+        orderViewModel.isLoading = true
+        hyperPaymentViewModel.requestCheckoutId(
+            amount: amount,
+            brandType: selectedBrand.dbValue
+        ) { checkoutId in
+            if let id = checkoutId {
+                currentHyperpayId = id
+                hyperPaymentViewModel.checkoutId = id
+                hyperPaymentViewModel.isShowingCheckout = true
+            } else {
+                orderViewModel.errorMessage = "فشل في بدء عملية الدفع"
+                orderViewModel.isLoading = false
+            }
+        }
+    }
+
+    func checkHyperpayStatus(resourcePath: String) {
+        hyperPaymentViewModel.checkPaymentStatus(
+            hyperpayId: resourcePath,
+            brandType: selectedBrand.dbValue
+        ) { status, response in
+            orderViewModel.isLoading = false
+            if status {
+                addBalance()
+            } else {
+                orderViewModel.errorMessage = "فشلت عملية الدفع"
+            }
+        }
+    }
+
     func addBalance() {
         let params: [String: Any] = [
-            "amount": coupon.isEmpty ? amount.toDouble() ?? 0.0 : paymentState.coupon?.final_total ?? 0.0,
+            "amount": coupon.isEmpty ? amount.toDouble() ?? 0.0 : orderViewModel.coupon?.final_total ?? 0.0,
             "coupon": coupon,
         ]
-        
-        paymentState.addBalanceToWallet(params: params) { message in
+
+        orderViewModel.addBalanceToWallet(params: params) { message in
             showAddBalanceView = false
             self.onsuccess()
         }
     }
 }
-

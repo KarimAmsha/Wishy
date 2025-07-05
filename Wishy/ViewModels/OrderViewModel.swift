@@ -25,6 +25,7 @@ class OrderViewModel: ObservableObject {
     @Published var coupon: Coupon?
     private var cancellables = Set<AnyCancellable>()
     @Published var tamaraCheckout: TamaraCheckoutData?
+    @Published var user: User?
 
     init(errorHandling: ErrorHandling) {
         self.errorHandling = errorHandling
@@ -276,6 +277,73 @@ class OrderViewModel: ObservableObject {
             })
             .store(in: &cancellables)
     }
+    
+    func addBalanceToWallet(params: [String: Any], onsuccess: @escaping (String) -> Void) {
+        guard let token = userSettings.token else {
+            self.handleAPIError(.customError(message: LocalizedStringKey.tokenError))
+            return
+        }
+
+        isLoading = true
+        errorMessage = nil
+        let endpoint = DataProvider.Endpoint.addBalanceToWallet(params: params, token: token)
+        
+        DataProvider.shared.request(endpoint: endpoint, responseType: SingleAPIResponse<User>.self)
+            .sink(receiveCompletion: { completion in
+                switch completion {
+                case .finished:
+                    break
+                case .failure(let error):
+                    // Use the centralized error handling component
+                    self.handleAPIError(error)
+                }
+            }, receiveValue: { [weak self] (response: SingleAPIResponse<User>) in
+                if response.status {
+                    self?.user = response.items // The user object
+                    self?.handleUserData()
+                    self?.errorMessage = nil
+                    onsuccess(response.message)
+                } else {
+                    // Use the centralized error handling component
+                    self?.handleAPIError(.customError(message: response.message))
+                }
+                self?.isLoading = false
+            })
+            .store(in: &cancellables)
+    }
+    
+    func checkWalletCoupon(params: [String: Any], onsuccess: @escaping () -> Void) {
+        guard let token = userSettings.token else {
+            self.handleAPIError(.customError(message: LocalizedStringKey.tokenError))
+            return
+        }
+
+        isLoading = true
+        errorMessage = nil
+        let endpoint = DataProvider.Endpoint.checkCoupon(params: params, token: token)
+        
+        DataProvider.shared.request(endpoint: endpoint, responseType: SingleAPIResponse<Coupon>.self)
+            .sink(receiveCompletion: { completion in
+                switch completion {
+                case .finished:
+                    break
+                case .failure(let error):
+                    // Use the centralized error handling component
+                    self.handleAPIError(error)
+                }
+            }, receiveValue: { [weak self] (response: SingleAPIResponse<Coupon>) in
+                if response.status {
+                    self?.coupon = response.items // The user object
+                    self?.errorMessage = nil
+                    onsuccess()
+                } else {
+                    // Use the centralized error handling component
+                    self?.handleAPIError(.customError(message: response.message))
+                }
+                self?.isLoading = false
+            })
+            .store(in: &cancellables)
+    }
 }
 
 extension OrderViewModel {
@@ -285,6 +353,12 @@ extension OrderViewModel {
 
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
             self.errorMessage = errorDescription
+        }
+    }
+    
+    func handleUserData() {
+        if let user = self.user {
+            UserSettings.shared.login(user: user, id: user.id ?? "", token: user.token ?? "")
         }
     }
 }

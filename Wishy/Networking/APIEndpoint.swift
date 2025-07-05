@@ -90,6 +90,16 @@ enum APIEndpoint {
         return APIEndpoint.baseURL + path
     }
 
+    // MARK: - New Encoding Support
+    var encoding: ParameterEncoding {
+        switch self.method {
+        case .get:
+            return URLEncoding.default
+        default:
+            return JSONEncoding.default
+        }
+    }
+
     var path: String {
         switch self {
         case .getWelcome:

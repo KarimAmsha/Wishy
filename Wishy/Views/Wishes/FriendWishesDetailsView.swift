@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import PopupView
 
 struct FriendWishesDetailsView: View {
     @EnvironmentObject var appRouter: AppRouter
@@ -14,6 +15,7 @@ struct FriendWishesDetailsView: View {
     @ObservedObject var cartViewModel = CartViewModel(errorHandling: ErrorHandling())
     @ObservedObject var wishesViewModel = WishesViewModel(errorHandling: ErrorHandling())
     @EnvironmentObject var appState: AppState
+    @State private var showAddToCartPopup = false
 
     var body: some View {
         VStack {
@@ -138,6 +140,26 @@ struct FriendWishesDetailsView: View {
                 alertType: .constant(.error)
             )
         )
+        .overlay(
+            MessageAlertObserverView(
+                message: $cartViewModel.errorMessage,
+                alertType: .constant(.error)
+            )
+        )
+        .popup(isPresented: $showAddToCartPopup) {
+            AddToCartPopup(isPresented: $showAddToCartPopup) {
+                // ما يحدث عند "الذهاب إلى السلة"
+                appState.currentPage = .cart
+                appRouter.navigateBack()
+            }
+        } customize: {
+            $0.type(.toast)
+              .position(.bottom)
+              .animation(.spring())
+              .closeOnTapOutside(true)
+              .backgroundColor(Color.black.opacity(0.27))
+              .useKeyboardSafeArea(true)
+        }
         .onAppear {
             laodWishData()
         }
@@ -156,14 +178,20 @@ extension FriendWishesDetailsView {
     
     func addToCart() {
         let params: [String: Any] = [
-            "product_id": wishesViewModel.wish?.product_id ?? "",
+            "product_id": wishesViewModel.wish?.product_id?.id ?? "",
             "qty": 1,
-            "variation_name": wishesViewModel.wish?.variation_name ?? "",
-            "variation_sku": wishesViewModel.wish?.variation_sku ?? ""
+            "variation_name": wishesViewModel.wish?.product_id?.variation_name ?? "",
+            "variation_sku": wishesViewModel.wish?.product_id?.variation_sku ?? ""
         ]
+        print("kkkk \(params)")
+
         cartViewModel.addToCart(params: params, onsuccess: {
+            // handle success
+            DispatchQueue.main.async {
+                print("mmm")
+                showAddToCartPopup = true
+            }
             NotificationCenter.default.post(name: .cartUpdated, object: nil)
-            showMessage()
         })
     }
     
@@ -192,14 +220,4 @@ extension FriendWishesDetailsView {
 
         appRouter.togglePopup(.alert(alertModel))
     }
-    
-//    func payWish() {
-//        let params: [String: Any] = [
-//            "total": wishesViewModel.wish?.total ?? ""
-//        ]
-//
-//        wishesViewModel.payWish(id: wishId ?? "", params: params) {
-//            appRouter.navigate(to: .paymentSuccess)
-//        }
-//    }
 }

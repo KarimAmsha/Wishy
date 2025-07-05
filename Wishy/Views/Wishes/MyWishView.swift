@@ -152,10 +152,10 @@ extension MyWishView {
     
     func addToCart() {
         let params: [String: Any] = [
-            "product_id": wishesViewModel.wish?.product_id ?? "",
+            "product_id": wishesViewModel.wish?.product_id?.id ?? "",
             "qty": 1,
-            "variation_name": wishesViewModel.wish?.variation_name ?? "",
-            "variation_sku": wishesViewModel.wish?.variation_sku ?? ""
+            "variation_name": wishesViewModel.wish?.product_id?.variation_name ?? "",
+            "variation_sku": wishesViewModel.wish?.product_id?.variation_sku ?? ""
         ]
         cartViewModel.addToCart(params: params, onsuccess: {
             NotificationCenter.default.post(name: .cartUpdated, object: nil)

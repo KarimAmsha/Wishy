@@ -24,14 +24,18 @@ enum PaymentOption: String, CaseIterable, Identifiable {
     }
 }
 
-enum HyperpayBrand: Int {
+enum HyperpayBrand: Int, CaseIterable, Identifiable {
     case visa = 1
-    case mada = 2
-    case apple = 3
+    case master = 2
+    case mada = 3
+    case apple = 4
+
+    var id: Int { rawValue }
 
     var displayName: String {
         switch self {
         case .visa: return "VISA"
+        case .master: return "MASTER"
         case .mada: return "MADA"
         case .apple: return "APPLEPAY"
         }
@@ -41,7 +45,27 @@ enum HyperpayBrand: Int {
         switch string.uppercased() {
         case "MADA": return .mada
         case "APPLEPAY": return .apple
+        case "MASTER", "MASTERCARD": return .master
         default: return .visa
+        }
+    }
+
+    /// ترجع الرقم المناسب لإرساله للداتابيس حسب المطلوب (1 للفيزا أو الماستر، 2 للمدى، 3 للأبل باي)
+    var dbValue: Int {
+        switch self {
+        case .visa, .master: return 1
+        case .mada: return 2
+        case .apple: return 3
+        }
+    }
+
+    /// أيقونات رمزية
+    var iconName: String {
+        switch self {
+        case .visa: return "creditcard"
+        case .master: return "creditcard.fill"
+        case .mada: return "creditcard.and.123"
+        case .apple: return "applelogo"
         }
     }
 }
@@ -86,9 +110,9 @@ struct CheckoutView: View {
     @State var tamaraViewModel: TamaraWebViewModel? = nil
     @State private var selectedPayment: PaymentOption = .hyperpay
     @State private var selectedBrand: HyperpayBrand = .mada
-    let availableBrands = ["MADA", "VISA", "APPLEPAY"]
     @StateObject private var hyperPaymentViewModel = HyperPaymentViewModel()
     @State private var currentHyperpayId: String?
+    @State private var showBrandSheet = false
 
     @State private var selectedAddress: AddressItem? {
         didSet {
@@ -133,32 +157,17 @@ struct CheckoutView: View {
                     NotesView(notes: $notes, placeholder: placeholderString)
                         .disabled(orderViewModel.isLoading)
 
-                    VStack(alignment: .leading, spacing: 16) {
-                        Text("اختر وسيلة الدفع").font(.headline)
-                        Picker("طريقة الدفع", selection: $selectedPayment) {
-                            ForEach(PaymentOption.allCases) { option in
-                                Text(option.displayName).tag(option)
-                            }
-                        }
-                        .pickerStyle(.segmented)
-                        
-                        if selectedPayment == .hyperpay {
-                            VStack(alignment: .leading, spacing: 8) {
-                                Text("نوع البطاقة")
-                                Picker("نوع البطاقة", selection: $selectedBrand) {
-                                    ForEach([HyperpayBrand.visa, .mada, .apple], id: \.self) { brand in
-                                        Text(brand.displayName).tag(brand)
-                                    }
-                                }
-                                .pickerStyle(.segmented)
-                            }
-                        }
-                    }
-                    .disabled(orderViewModel.isLoading)
-
                     if let cartTotal = cartViewModel.cartTotal {
                         OrderSummarySection(cartTotal: cartTotal)
                     }
+                    
+                    PaymentSection(
+                        selectedPayment: $selectedPayment,
+                        selectedBrand: $selectedBrand,
+                        showBrandSheet: $showBrandSheet,
+                        isDisabled: orderViewModel.isLoading,
+                        amount: cartViewModel.cartTotal?.final_total ?? 0.0
+                    )
                 }
                 .padding()
             }
@@ -167,34 +176,7 @@ struct CheckoutView: View {
                     LoadingView()
                 }
                 
-                Button(action: {
-                    if selectedPayment == .cash {
-                        addOrder()
-                    } else if selectedPayment == .tamara {
-                        tamaraCheckout()
-                    } else if selectedPayment == .hyperpay {
-                        if let cartTotal = cartViewModel.cartTotal {
-                            startHyperpayPayment(amount: 2.00)//cartTotal.final_total ?? 0.0)
-                        }
-                    }
-                }) {
-                    HStack {
-                        if selectedPayment == .hyperpay {
-                            Image(systemName: "creditcard")
-                            Text("ادفع إلكترونيًا")
-                        } else if selectedPayment == .tamara {
-                            Image(systemName: "cart.fill")
-                            Text("ادفع عبر تمارا")
-                        } else {
-                            Image(systemName: "banknote")
-                            Text("الدفع عند الاستلام")
-                        }
-                    }
-                    .font(.headline)
-                    .frame(maxWidth: .infinity)
-                }
-                .buttonStyle(GradientPrimaryButton(fontSize: 16, fontWeight: .bold, background: Color.primaryGradientColor(), foreground: .white, height: 48, radius: 12))
-                .disabled(orderViewModel.isLoading)
+                checkoutButton()
             }
             .padding()
         }
@@ -305,7 +287,7 @@ struct CheckoutView: View {
                 ) { result in
                     switch result {
                     case .success(let resourcePath):
-                        checkHyperpayStatus(resourcePath: resourcePath)
+                        checkHyperpayStatus(resourcePath: checkoutId)
                     case .failure(let error):
                         orderViewModel.errorMessage = error.localizedDescription
                         orderViewModel.isLoading = false
@@ -333,10 +315,79 @@ struct CheckoutView: View {
         }
     }
     
+    @ViewBuilder
+    func checkoutButton() -> some View {
+        let amountText: String = {
+            if let amount = cartViewModel.cartTotal?.final_total {
+                return String(format: "%.2f ﷼", amount)
+            }
+            return ""
+        }()
+
+        let buttonLabel: some View = HStack {
+            if selectedPayment == .hyperpay {
+                Image(systemName: "creditcard")
+                Text("ادفع إلكترونيًا")
+            } else if selectedPayment == .tamara {
+                Image(systemName: "cart.fill")
+                Text("ادفع عبر تمارا")
+            } else {
+                Image(systemName: "banknote")
+                Text("الدفع عند الاستلام")
+            }
+
+            Spacer()
+
+            if !amountText.isEmpty {
+                Text(amountText)
+                    .font(.subheadline)
+                    .foregroundColor(.white.opacity(0.85))
+            }
+        }
+        .font(.headline)
+        .frame(maxWidth: .infinity)
+
+        Button(action: {
+            orderViewModel.errorMessage = nil
+            if selectedPayment == .cash {
+                addOrder()
+            } else if selectedPayment == .tamara {
+                tamaraCheckout()
+            } else if selectedPayment == .hyperpay {
+                guard let user = UserSettings.shared.user else {
+                    orderViewModel.errorMessage = "يرجى تسجيل الدخول أولًا"
+                    return
+                }
+                guard let name = user.full_name, !name.isEmpty,
+                      let email = user.email, !email.isEmpty else {
+                    orderViewModel.errorMessage = "الرجاء التأكد من إدخال الاسم والبريد الإلكتروني في حسابك قبل الدفع الإلكتروني"
+                    return
+                }
+
+                if let amount = cartViewModel.cartTotal?.final_total {
+                    startHyperpayPayment(amount: amount)
+                }
+            }
+        }) {
+            buttonLabel
+        }
+        .buttonStyle(
+            GradientPrimaryButton(
+                fontSize: 16,
+                fontWeight: .bold,
+                background: Color.primaryGradientColor(),
+                foreground: .white,
+                height: 48,
+                radius: 12
+            )
+        )
+        .disabled(orderViewModel.isLoading)
+    }
+
     func checkHyperpayStatus(resourcePath: String) {
         hyperPaymentViewModel.checkPaymentStatus(
             hyperpayId: resourcePath,
-            brandType: selectedBrand.rawValue
+            brandType: selectedBrand.dbValue
         ) { status, response in
             if status {
                 addOrder()
@@ -416,31 +467,6 @@ struct ProductSummarySection: View {
         .cornerRadius(10)
     }
 }
-
-//struct PaymentInformationSection: View {
-//    @Binding var payCash: Bool
-//    @Binding var payMada: Bool
-//    @Binding var payTamara: Bool
-//
-//    var body: some View {
-//        VStack(alignment: .leading, spacing: 10) {
-//            Text(LocalizedStringKey.paymentMethod)
-//                .customFont(weight: .bold, size: 15)
-//                .foregroundColor(.black121212())
-//
-//            HStack {
-////                CheckboxButton(title: LocalizedStringKey.payCash, isChecked: $payCash, other1: $payMada, other2: $payTamara)
-////                Spacer()
-//                CheckboxButton(title: LocalizedStringKey.payMada, isChecked: $payMada, other1: $payCash, other2: $payTamara)
-//                Spacer()
-//                CheckboxButton(title: LocalizedStringKey.payTamara, isChecked: $payTamara, other1: $payCash, other2: $payMada)
-//            }
-//        }
-//        .padding()
-//        .background(Color.gray.opacity(0.1))
-//        .cornerRadius(10)
-//    }
-//}
 
 struct CheckboxButton: View {
     let title: String
@@ -875,6 +901,156 @@ struct NotesView: View {
     }
 }
 
+struct PaymentSection: View {
+    @Binding var selectedPayment: PaymentOption
+    @Binding var selectedBrand: HyperpayBrand
+    @Binding var showBrandSheet: Bool
+    var isDisabled: Bool = false
+    var amount: Double
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            Text("اختر وسيلة الدفع")
+                .font(.headline)
+                .padding(.bottom, 4)
+
+            ForEach(PaymentOption.allCases) { option in
+                paymentOptionRow(option: option)
+            }
+
+            if selectedPayment == .hyperpay {
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("نوع البطاقة")
+                        .font(.subheadline)
+                    Button {
+                        showBrandSheet = true
+                    } label: {
+                        HStack {
+                            Text(selectedBrand.displayName)
+                                .foregroundColor(.primary)
+                            Spacer()
+                            Image(systemName: "chevron.down")
+                                .foregroundColor(.gray)
+                        }
+                        .padding()
+                        .background(Color.gray.opacity(0.1))
+                        .cornerRadius(10)
+                    }
+                }
+                .disabled(isDisabled)
+            }
+        }
+        .padding()
+        .background(Color.gray.opacity(0.1))
+        .cornerRadius(10)
+        .sheet(isPresented: $showBrandSheet) {
+            BrandSheet(selectedBrand: $selectedBrand, showBrandSheet: $showBrandSheet)
+        }
+    }
+
+    @ViewBuilder
+    private func paymentOptionRow(option: PaymentOption) -> some View {
+        let isSelected = selectedPayment == option
+        let formattedAmount = String(format: "%.2f", amount)
+
+        Button(action: {
+            selectedPayment = option
+        }) {
+            HStack {
+                Image(systemName: isSelected ? "largecircle.fill.circle" : "circle")
+                    .foregroundColor(.primary())
+                VStack(alignment: .leading) {
+                    Text(option.displayName)
+                        .foregroundColor(.black)
+                    if isSelected {
+                        Text("المبلغ: \(formattedAmount) ﷼")
+                            .font(.caption)
+                            .foregroundColor(.gray)
+                    }
+                }
+                Spacer()
+            }
+            .padding()
+            .background(Color.white)
+            .cornerRadius(8)
+            .overlay(
+                RoundedRectangle(cornerRadius: 8)
+                    .stroke(isSelected ? Color.primary() : Color.gray.opacity(0.4), lineWidth: 1)
+            )
+        }
+        .disabled(isDisabled)
+    }
+}
+
+struct BrandSheet: View {
+    @Binding var selectedBrand: HyperpayBrand
+    @Binding var showBrandSheet: Bool
+
+    var brands: [HyperpayBrand] = [.visa, .master, .mada, .apple]
+
+    var body: some View {
+        VStack(spacing: 16) {
+            Capsule()
+                .fill(Color.gray.opacity(0.4))
+                .frame(width: 40, height: 5)
+                .padding(.top, 8)
+
+            Text("اختر نوع البطاقة")
+                .font(.title3)
+                .fontWeight(.semibold)
+                .foregroundColor(.primary)
+                .padding(.bottom, 8)
+
+            ForEach(brands, id: \.self) { brand in
+                Button {
+                    selectedBrand = brand
+                    showBrandSheet = false
+                } label: {
+                    HStack {
+                        Image(systemName: brand.iconName)
+                            .foregroundColor(.black)
+                            .frame(width: 24)
+                        Text(brand.displayName)
+                            .foregroundColor(.primary)
+                            .fontWeight(selectedBrand == brand ? .bold : .regular)
+                        Spacer()
+                        if selectedBrand == brand {
+                            Image(systemName: "checkmark.circle.fill")
+                                .foregroundColor(.green)
+                        }
+                    }
+                    .padding()
+                    .background(
+                        RoundedRectangle(cornerRadius: 12)
+                            .fill(Color(.systemGray6))
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 12)
+                                    .stroke(selectedBrand == brand ? Color.blue : Color.clear, lineWidth: 1.5)
+                            )
+                    )
+                }
+            }
+
+            Spacer()
+
+            Button(action: {
+                showBrandSheet = false
+            }) {
+                Text("إغلاق")
+                    .font(.headline)
+                    .foregroundColor(.red)
+                    .frame(maxWidth: .infinity)
+                    .padding()
+                    .background(Color(.systemGray5))
+                    .cornerRadius(10)
+            }
+            .padding(.bottom)
+        }
+        .padding(.horizontal)
+        .presentationDetents([.medium])
+    }
+}
+
 extension CheckoutView {
     func startHyperpayPayment(amount: Double) {
         let validation = validateAddress(purchaseType: selectedPurchaseType, selectedAddress: selectedAddress, region: region)
@@ -884,7 +1060,7 @@ extension CheckoutView {
 
         hyperPaymentViewModel.requestCheckoutId(
             amount: amount,
-            brandType: selectedBrand.rawValue // أهم شي هذا!
+            brandType: selectedBrand.dbValue
         ) { checkoutId in
             if let id = checkoutId {
                 print("checkoutId sent to SDK: \(id)")

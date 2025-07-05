@@ -125,6 +125,10 @@ class HyperPaymentViewModel: ObservableObject {
             }
             return
         }
+        print("urlurl \(url)")
+        print("hyperpayId \(hyperpayId)")
+        print("brandType \(brandType)")
+
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         let bodyString = "type=\(brandType)"

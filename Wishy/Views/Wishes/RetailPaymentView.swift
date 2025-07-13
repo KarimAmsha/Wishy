@@ -123,17 +123,21 @@ struct RetailPaymentView: View {
             if let checkoutId = hyperPaymentViewModel.checkoutId {
                 HyperpayCheckoutView(
                     checkoutId: checkoutId,
-                    paymentBrands: [selectedBrand.displayName]
-                ) { result in
-                    switch result {
-                    case .success(let resourcePath):
-                        checkHyperpayStatus(resourcePath: checkoutId)
-                    case .failure(let error):
-                        orderViewModel.errorMessage = error.localizedDescription
-                        orderViewModel.isLoading = false
+                    paymentBrands: [selectedBrand.displayName],
+                    onResult: { result in
+                        switch result {
+                        case .success(let resourcePath):
+                            checkHyperpayStatus(resourcePath: checkoutId)
+                        case .failure(let error):
+                            orderViewModel.errorMessage = error.localizedDescription
+                            orderViewModel.isLoading = false
+                        }
+                    },
+                    onDismiss: {
+                        // أغلق الشاشة فقط هنا!
+                        hyperPaymentViewModel.isShowingCheckout = false
                     }
-                    hyperPaymentViewModel.isShowingCheckout = false
-                }
+                )
             }
         }
         .fullScreenCover(isPresented: $showTamaraPayment) {

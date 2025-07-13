@@ -9,14 +9,14 @@ struct HyperpayCheckoutView: UIViewControllerRepresentable {
     let checkoutId: String
     let paymentBrands: [String]
     let onResult: (Result<String, Error>) -> Void
+    var onDismiss: (() -> Void)? = nil
 
     func makeCoordinator() -> Coordinator {
-        Coordinator(onResult: onResult)
+        Coordinator(onResult: onResult, onDismiss: onDismiss)
     }
 
     func makeUIViewController(context: Context) -> UIViewController {
         let viewController = UIViewController()
-
         let paymentProvider = OPPPaymentProvider(mode: .test)
         let checkoutSettings = OPPCheckoutSettings()
         checkoutSettings.paymentBrands = paymentBrands
@@ -47,25 +47,60 @@ struct HyperpayCheckoutView: UIViewControllerRepresentable {
 
     class Coordinator: NSObject, OPPCheckoutProviderDelegate {
         let onResult: (Result<String, Error>) -> Void
+        var onDismiss: (() -> Void)?
         weak var checkoutProvider: OPPCheckoutProvider?
 
-        init(onResult: @escaping (Result<String, Error>) -> Void) {
+        init(onResult: @escaping (Result<String, Error>) -> Void, onDismiss: (() -> Void)?) {
             self.onResult = onResult
+            self.onDismiss = onDismiss
         }
 
         func checkoutProvider(_ checkoutProvider: OPPCheckoutProvider, didSubmitTransaction transaction: OPPTransaction?, error: Error?) {
+            print("==== Hyperpay SDK Result Callback ====")
             if let error = error {
+                print("Error: \(error.localizedDescription)")
                 onResult(.failure(error))
+                checkoutProvider.dismissCheckout(animated: true, completion: { [weak self] in
+                    self?.onDismiss?()
+                })
             } else if let transaction = transaction {
+                print("Transaction: \(transaction)")
+                print("Resource Path: \(transaction.resourcePath ?? "nil")")
+                print("Type: \(transaction.type.rawValue)")
                 onResult(.success(transaction.resourcePath ?? ""))
+
+                if transaction.type == .asynchronous {
+                    // انتظر سفاري، لا تغلق
+                } else {
+                    checkoutProvider.dismissCheckout(animated: true, completion: { [weak self] in
+                        self?.onDismiss?()
+                    })
+                }
+            } else {
+                print("No error, no transaction -- unexpected result!")
+                checkoutProvider.dismissCheckout(animated: true, completion: { [weak self] in
+                    self?.onDismiss?()
+                })
             }
-            checkoutProvider.dismissCheckout(animated: true, completion: nil)
         }
 
         func checkoutProviderDidCancel(_ checkoutProvider: OPPCheckoutProvider) {
-//            onResult(.failure(NSError(domain: "تم الالغاء من قبل المستخدم", code: -1)))
-            onResult(.failure("تم الالغاء من قبل المستخدم"))
-            checkoutProvider.dismissCheckout(animated: true, completion: nil)
+            let error = NSError(
+                domain: "Hyperpay",
+                code: -1,
+                userInfo: [NSLocalizedDescriptionKey: "تم الإلغاء من قبل المستخدم"]
+            )
+            onResult(.failure(error))
+            checkoutProvider.dismissCheckout(animated: true, completion: { [weak self] in
+                self?.onDismiss?()
+            })
+        }
+
+        func checkoutProviderDidFinishSafariViewController(_ checkoutProvider: OPPCheckoutProvider) {
+            print("checkoutProviderDidFinishSafariViewController called")
+            checkoutProvider.dismissCheckout(animated: true, completion: { [weak self] in
+                self?.onDismiss?()
+            })
         }
     }
 }

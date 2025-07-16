@@ -3,6 +3,7 @@ import PopupView
 import MapKit
 import goSellSDK
 import TamaraSDK
+import PassKit
 
 enum PurchaseType: String, CaseIterable, Identifiable {
     case myself = "شخصي"
@@ -114,6 +115,11 @@ struct CheckoutView: View {
     @State private var currentHyperpayId: String?
     @State private var showBrandSheet = false
 
+    @State private var showApplePaySheet = false
+    @State private var applePayCheckoutId: String?
+    @State private var applePayAmount: Double = 0.0
+    let canShowApplePay: Bool = PKPaymentAuthorizationViewController.canMakePayments(usingNetworks: [.visa, .masterCard, .mada])
+
     @State private var selectedAddress: AddressItem? {
         didSet {
             // Update the region and other address-related fields when a new address is selected
@@ -165,6 +171,7 @@ struct CheckoutView: View {
                         selectedPayment: $selectedPayment,
                         selectedBrand: $selectedBrand,
                         showBrandSheet: $showBrandSheet,
+                        canShowApplePay: canShowApplePay,
                         isDisabled: orderViewModel.isLoading,
                         amount: cartViewModel.cartTotal?.final_total ?? 0.0
                     )
@@ -300,6 +307,24 @@ struct CheckoutView: View {
                 )
             }
         }
+        .fullScreenCover(isPresented: $showApplePaySheet) {
+            if let checkoutId = applePayCheckoutId {
+                ApplePayControllerView(
+                    checkoutId: checkoutId,
+                    amount: applePayAmount,
+                    onResult: { result in
+                        showApplePaySheet = false
+                        switch result {
+                        case .success(let hyperpayId):
+                            checkHyperpayStatus(resourcePath: hyperpayId)
+                        case .failure(let error):
+                            orderViewModel.errorMessage = error.localizedDescription
+                            orderViewModel.isLoading = false
+                        }
+                    }
+                )
+            }
+        }
         .fullScreenCover(isPresented: $showTamaraPayment) {
             if let url = URL(string: checkoutUrl) {
                 SafariView(url: url) { redirectedURL in
@@ -326,64 +351,74 @@ struct CheckoutView: View {
             return ""
         }()
 
-        let buttonLabel: some View = HStack {
-            if selectedPayment == .hyperpay {
-                Image(systemName: "creditcard")
-                Text("ادفع إلكترونيًا")
-            } else if selectedPayment == .tamara {
-                Image(systemName: "cart.fill")
-                Text("ادفع عبر تمارا")
-            } else {
-                Image(systemName: "banknote")
-                Text("الدفع عند الاستلام")
-            }
-
-            Spacer()
-
-            if !amountText.isEmpty {
-                Text(amountText)
-                    .font(.subheadline)
-                    .foregroundColor(.white.opacity(0.85))
-            }
-        }
-        .font(.headline)
-        .frame(maxWidth: .infinity)
-
-        Button(action: {
-            orderViewModel.errorMessage = nil
-            if selectedPayment == .cash {
-                addOrder()
-            } else if selectedPayment == .tamara {
-                tamaraCheckout()
-            } else if selectedPayment == .hyperpay {
-                guard let user = UserSettings.shared.user else {
-                    orderViewModel.errorMessage = "يرجى تسجيل الدخول أولًا"
-                    return
-                }
-                guard let name = user.full_name, !name.isEmpty,
-                      let email = user.email, !email.isEmpty else {
-                    orderViewModel.errorMessage = "الرجاء التأكد من إدخال الاسم والبريد الإلكتروني في حسابك قبل الدفع الإلكتروني"
-                    return
-                }
-
+        if selectedPayment == .hyperpay && canShowApplePay {
+            // زر Apple Pay الرسمي فقط!
+            ApplePayButtonView {
+                // عند الضغط على زر أبل باي
                 if let amount = cartViewModel.cartTotal?.final_total {
                     startHyperpayPayment(amount: amount)
                 }
             }
-        }) {
-            buttonLabel
-        }
-        .buttonStyle(
-            GradientPrimaryButton(
-                fontSize: 16,
-                fontWeight: .bold,
-                background: Color.primaryGradientColor(),
-                foreground: .white,
-                height: 48,
-                radius: 12
+            .frame(height: 48)
+            .padding(.vertical, 8)
+        } else {
+            // باقي وسائل الدفع (الزر العادي)
+            Button(action: {
+                orderViewModel.errorMessage = nil
+                if selectedPayment == .cash {
+                    addOrder()
+                } else if selectedPayment == .tamara {
+                    tamaraCheckout()
+                } else if selectedPayment == .hyperpay {
+                    guard let user = UserSettings.shared.user else {
+                        orderViewModel.errorMessage = "يرجى تسجيل الدخول أولًا"
+                        return
+                    }
+                    guard let name = user.full_name, !name.isEmpty,
+                          let email = user.email, !email.isEmpty else {
+                        orderViewModel.errorMessage = "الرجاء التأكد من إدخال الاسم والبريد الإلكتروني في حسابك قبل الدفع الإلكتروني"
+                        return
+                    }
+
+                    if let amount = cartViewModel.cartTotal?.final_total {
+                        startHyperpayPayment(amount: amount)
+                    }
+                }
+            }) {
+                let buttonLabel: some View = HStack {
+                    if selectedPayment == .hyperpay {
+                        Image(systemName: "creditcard")
+                        Text("ادفع إلكترونيًا")
+                    } else if selectedPayment == .tamara {
+                        Image(systemName: "cart.fill")
+                        Text("ادفع عبر تمارا")
+                    } else {
+                        Image(systemName: "banknote")
+                        Text("الدفع عند الاستلام")
+                    }
+                    Spacer()
+                    if !amountText.isEmpty {
+                        Text(amountText)
+                            .font(.subheadline)
+                            .foregroundColor(.white.opacity(0.85))
+                    }
+                }
+                .font(.headline)
+                .frame(maxWidth: .infinity)
+                buttonLabel
+            }
+            .buttonStyle(
+                GradientPrimaryButton(
+                    fontSize: 16,
+                    fontWeight: .bold,
+                    background: Color.primaryGradientColor(),
+                    foreground: .white,
+                    height: 48,
+                    radius: 12
+                )
             )
-        )
-        .disabled(orderViewModel.isLoading)
+            .disabled(orderViewModel.isLoading)
+        }
     }
 
     func checkHyperpayStatus(resourcePath: String) {
@@ -907,6 +942,7 @@ struct PaymentSection: View {
     @Binding var selectedPayment: PaymentOption
     @Binding var selectedBrand: HyperpayBrand
     @Binding var showBrandSheet: Bool
+    var canShowApplePay: Bool
     var isDisabled: Bool = false
     var amount: Double
 
@@ -946,7 +982,7 @@ struct PaymentSection: View {
         .background(Color.gray.opacity(0.1))
         .cornerRadius(10)
         .sheet(isPresented: $showBrandSheet) {
-            BrandSheet(selectedBrand: $selectedBrand, showBrandSheet: $showBrandSheet)
+            BrandSheet(selectedBrand: $selectedBrand, showBrandSheet: $showBrandSheet, canShowApplePay: canShowApplePay)
         }
     }
 
@@ -987,8 +1023,15 @@ struct PaymentSection: View {
 struct BrandSheet: View {
     @Binding var selectedBrand: HyperpayBrand
     @Binding var showBrandSheet: Bool
+    var canShowApplePay: Bool
 
-    var brands: [HyperpayBrand] = [.visa, .master, .mada, .apple]
+    var brands: [HyperpayBrand] {
+        var base: [HyperpayBrand] = [.visa, .master, .mada]
+        if canShowApplePay {
+            base.append(.apple)
+        }
+        return base
+    }
 
     var body: some View {
         VStack(spacing: 16) {
@@ -1056,26 +1099,62 @@ struct BrandSheet: View {
 extension CheckoutView {
     func startHyperpayPayment(amount: Double) {
         let validation = validateAddress(purchaseType: selectedPurchaseType, selectedAddress: selectedAddress, region: region)
-
         handleValidationResult(validation)
         guard validation == .valid else { return }
-
+        
+        // ⬅️ طلب checkoutId من الباك اند
         hyperPaymentViewModel.requestCheckoutId(
             amount: amount,
             brandType: selectedBrand.dbValue
         ) { checkoutId in
             if let id = checkoutId {
-                print("checkoutId sent to SDK: \(id)")
-                print("brands sent: \(selectedBrand.displayName)")
-                print("token: \(UserSettings.shared.token)")
                 currentHyperpayId = id
-                hyperPaymentViewModel.isShowingCheckout = true
+                if selectedBrand == .apple {
+                    if !canShowApplePay {
+                        orderViewModel.errorMessage = "جهازك لا يدعم Apple Pay أو لم يتم إضافة بطاقة"
+                        return
+                    }
+                    showApplePaySheet(checkoutId: id, amount: amount)
+                } else {
+                    hyperPaymentViewModel.isShowingCheckout = true
+                }
             } else {
                 orderViewModel.errorMessage = "تعذر بدء عملية الدفع"
             }
         }
     }
+    
+    // وظيفة عرض Apple Pay Sheet (ضعها في extension)
+    func showApplePaySheet(checkoutId: String, amount: Double) {
+        applePayCheckoutId = checkoutId
+        applePayAmount = amount
+        showApplePaySheet = true
+    }
 }
+
+//extension CheckoutView {
+//    func startHyperpayPayment(amount: Double) {
+//        let validation = validateAddress(purchaseType: selectedPurchaseType, selectedAddress: selectedAddress, region: region)
+//
+//        handleValidationResult(validation)
+//        guard validation == .valid else { return }
+//
+//        hyperPaymentViewModel.requestCheckoutId(
+//            amount: amount,
+//            brandType: selectedBrand.dbValue
+//        ) { checkoutId in
+//            if let id = checkoutId {
+//                print("checkoutId sent to SDK: \(id)")
+//                print("brands sent: \(selectedBrand.displayName)")
+//                print("token: \(UserSettings.shared.token)")
+//                currentHyperpayId = id
+//                hyperPaymentViewModel.isShowingCheckout = true
+//            } else {
+//                orderViewModel.errorMessage = "تعذر بدء عملية الدفع"
+//            }
+//        }
+//    }
+//}
 
 extension CheckoutView {
     func tamaraCheckout() {

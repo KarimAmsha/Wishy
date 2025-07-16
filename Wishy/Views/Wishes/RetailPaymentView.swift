@@ -3,6 +3,7 @@
 import SwiftUI
 import goSellSDK
 import TamaraSDK
+import PassKit
 
 struct RetailPaymentView: View {
     @EnvironmentObject var appRouter: AppRouter
@@ -20,6 +21,10 @@ struct RetailPaymentView: View {
     @State private var showTamaraPayment = false
     @State private var checkoutUrl = ""
     @State var tamaraViewModel: TamaraWebViewModel? = nil
+    let canShowApplePay: Bool = PKPaymentAuthorizationViewController.canMakePayments(usingNetworks: [.visa, .masterCard, .mada])
+    @State private var showApplePaySheet = false
+    @State private var applePayCheckoutId: String?
+    @State private var applePayAmount: Double = 0.0
 
     var body: some View {
         VStack {
@@ -77,25 +82,37 @@ struct RetailPaymentView: View {
                 LoadingView()
             }
 
-            Button {
-                if total.isEmpty {
-                    wishesViewModel.errorMessage = "ادخل قيمة للاستمرار بالدفع!"
-                    return
-                }
-
-                let amount = total.toDouble() ?? 0.0
-
-                if payHyper {
+            // زر Apple Pay الرسمي إذا تم اختياره وكان الجهاز يدعم
+            if payHyper && selectedBrand == .apple && canShowApplePay {
+                ApplePayButtonView {
+                    if total.isEmpty {
+                        wishesViewModel.errorMessage = "ادخل قيمة للاستمرار بالدفع!"
+                        return
+                    }
+                    let amount = total.toDouble() ?? 0.0
                     startHyperpayPayment(amount: amount)
-                } else if payTamara {
-                    startTamaraCheckout(amount: amount)
                 }
-            } label: {
-                Text("الاستمرار للدفع")
+                .frame(height: 48)
+                .padding(.horizontal)
+            } else {
+                Button {
+                    if total.isEmpty {
+                        wishesViewModel.errorMessage = "ادخل قيمة للاستمرار بالدفع!"
+                        return
+                    }
+                    let amount = total.toDouble() ?? 0.0
+                    if payHyper {
+                        startHyperpayPayment(amount: amount)
+                    } else if payTamara {
+                        startTamaraCheckout(amount: amount)
+                    }
+                } label: {
+                    Text("الاستمرار للدفع")
+                }
+                .buttonStyle(GradientPrimaryButton(fontSize: 16, fontWeight: .bold, background: Color.primaryGradientColor(), foreground: .white, height: 48, radius: 12))
+                .padding(.horizontal, 16)
+                .disabled(orderViewModel.isLoading)
             }
-            .buttonStyle(GradientPrimaryButton(fontSize: 16, fontWeight: .bold, background: Color.primaryGradientColor(), foreground: .white, height: 48, radius: 12))
-            .padding(.horizontal, 16)
-            .disabled(orderViewModel.isLoading)
         }
         .padding(16)
         .navigationBarBackButtonHidden()
@@ -117,7 +134,7 @@ struct RetailPaymentView: View {
         .overlay(MessageAlertObserverView(message: $orderViewModel.errorMessage, alertType: .constant(.error)))
         .overlay(MessageAlertObserverView(message: $wishesViewModel.errorMessage, alertType: .constant(.error)))
         .sheet(isPresented: $showBrandSheet) {
-            BrandSheet(selectedBrand: $selectedBrand, showBrandSheet: $showBrandSheet)
+            BrandSheet(selectedBrand: $selectedBrand, showBrandSheet: $showBrandSheet, canShowApplePay: canShowApplePay)
         }
         .fullScreenCover(isPresented: $hyperPaymentViewModel.isShowingCheckout) {
             if let checkoutId = hyperPaymentViewModel.checkoutId {
@@ -136,6 +153,24 @@ struct RetailPaymentView: View {
                     onDismiss: {
                         // أغلق الشاشة فقط هنا!
                         hyperPaymentViewModel.isShowingCheckout = false
+                    }
+                )
+            }
+        }
+        .fullScreenCover(isPresented: $showApplePaySheet) {
+            if let checkoutId = applePayCheckoutId {
+                ApplePayControllerView(
+                    checkoutId: checkoutId,
+                    amount: applePayAmount,
+                    onResult: { result in
+                        showApplePaySheet = false
+                        switch result {
+                        case .success(let hyperpayId):
+                            checkHyperpayStatus(resourcePath: hyperpayId)
+                        case .failure(let error):
+                            orderViewModel.errorMessage = error.localizedDescription
+                            orderViewModel.isLoading = false
+                        }
                     }
                 )
             }
@@ -180,13 +215,26 @@ struct RetailPaymentView: View {
         ) { checkoutId in
             if let id = checkoutId {
                 currentHyperpayId = id
-                hyperPaymentViewModel.checkoutId = id
-                hyperPaymentViewModel.isShowingCheckout = true
+                if selectedBrand == .apple {
+                    if !canShowApplePay {
+                        orderViewModel.errorMessage = "جهازك لا يدعم Apple Pay أو لم يتم إضافة بطاقة"
+                        return
+                    }
+                    showApplePaySheet(checkoutId: id, amount: amount)
+                } else {
+                    hyperPaymentViewModel.isShowingCheckout = true
+                }
             } else {
-                orderViewModel.errorMessage = "فشل في بدء عملية الدفع"
-                orderViewModel.isLoading = false
+                orderViewModel.errorMessage = "تعذر بدء عملية الدفع"
             }
         }
+    }
+    
+    // وظيفة عرض Apple Pay Sheet (ضعها في extension)
+    func showApplePaySheet(checkoutId: String, amount: Double) {
+        applePayCheckoutId = checkoutId
+        applePayAmount = amount
+        showApplePaySheet = true
     }
 
     func checkHyperpayStatus(resourcePath: String) {
@@ -233,7 +281,7 @@ struct RetailPaymentView: View {
             )
             showTamaraPayment.toggle()
         }
-    }
+    }    
 }
 
 extension RetailPaymentView {

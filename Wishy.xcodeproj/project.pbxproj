@@ -247,6 +247,8 @@
 		529EC50C2DC90304009AB1FF /* TamaraWebViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 529EC50B2DC90302009AB1FF /* TamaraWebViewModel.swift */; };
 		529EC50E2DC9031A009AB1FF /* TamaraWebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 529EC50D2DC90318009AB1FF /* TamaraWebView.swift */; };
 		52BEF2EF2DD9DD9D0013309C /* Notification.Name+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52BEF2EE2DD9DD8E0013309C /* Notification.Name+Extension.swift */; };
+		52E611052E26A6EE001788EA /* ApplePayButtonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52E611042E26A6ED001788EA /* ApplePayButtonView.swift */; };
+		52E611072E26A8E3001788EA /* ApplePayControllerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52E611062E26A8E1001788EA /* ApplePayControllerView.swift */; };
 		52F03F922DC1448F00D11215 /* TamaraProduct.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52F03F912DC1448E00D11215 /* TamaraProduct.swift */; };
 		54A6180AC67CEF93A80C6124 /* Pods_Wishy.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5D22D5591E97E8FD4660DBF9 /* Pods_Wishy.framework */; };
 /* End PBXBuildFile section */
@@ -481,6 +483,8 @@
 		529EC50B2DC90302009AB1FF /* TamaraWebViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TamaraWebViewModel.swift; sourceTree = "<group>"; };
 		529EC50D2DC90318009AB1FF /* TamaraWebView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TamaraWebView.swift; sourceTree = "<group>"; };
 		52BEF2EE2DD9DD8E0013309C /* Notification.Name+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Notification.Name+Extension.swift"; sourceTree = "<group>"; };
+		52E611042E26A6ED001788EA /* ApplePayButtonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApplePayButtonView.swift; sourceTree = "<group>"; };
+		52E611062E26A8E1001788EA /* ApplePayControllerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApplePayControllerView.swift; sourceTree = "<group>"; };
 		52F03F912DC1448E00D11215 /* TamaraProduct.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TamaraProduct.swift; sourceTree = "<group>"; };
 		5D22D5591E97E8FD4660DBF9 /* Pods_Wishy.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Wishy.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		D2534A70AB7D2E6CD03D10E8 /* Pods-Wishy.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Wishy.debug.xcconfig"; path = "Target Support Files/Pods-Wishy/Pods-Wishy.debug.xcconfig"; sourceTree = "<group>"; };
@@ -1060,6 +1064,8 @@
 		526644C82E17C6D0005DEA6D /* Hyperpay */ = {
 			isa = PBXGroup;
 			children = (
+				52E611062E26A8E1001788EA /* ApplePayControllerView.swift */,
+				52E611042E26A6ED001788EA /* ApplePayButtonView.swift */,
 				526644C92E17C6EB005DEA6D /* HyperpayCheckoutView.swift */,
 				526644C62E17C6AA005DEA6D /* HyperPaymentViewModel.swift */,
 			);
@@ -1350,6 +1356,7 @@
 				520BB0382DC959AC00DB6315 /* SafariView.swift in Sources */,
 				1ECC95042BDD14A0002BFE54 /* Pagination.swift in Sources */,
 				1ECC95072BDD1587002BFE54 /* AuthenticationView.swift in Sources */,
+				52E611052E26A6EE001788EA /* ApplePayButtonView.swift in Sources */,
 				1ECC947A2BDC5B8B002BFE54 /* Enum.swift in Sources */,
 				1E38FB662C24A8E7001A2B78 /* CategoryView.swift in Sources */,
 				1ECC94562BDC57EA002BFE54 /* APIClient.swift in Sources */,
@@ -1394,6 +1401,7 @@
 				1EDEF6852BE1A93600863C10 /* FriendWishesView.swift in Sources */,
 				1EC27FF02C038A0E0007279D /* CartItemView.swift in Sources */,
 				1E1EDA7C2C1CDA27003047CA /* UserWishesView.swift in Sources */,
+				52E611072E26A8E3001788EA /* ApplePayControllerView.swift in Sources */,
 				1EDEF67D2BE1930C00863C10 /* ProductsListView.swift in Sources */,
 				1E2804422C0634450021DFB0 /* Supplier.swift in Sources */,
 				1EA740582BFBCDFE0028AAD0 /* Products.swift in Sources */,
@@ -1576,10 +1584,12 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = Wishy/Wishy.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 8;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
+				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 9;
 				DEVELOPMENT_ASSET_PATHS = "\"Wishy/Preview Content\"";
-				DEVELOPMENT_TEAM = CKZBH9QCG3;
+				DEVELOPMENT_TEAM = "";
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = CKZBH9QCG3;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Wishy/Info.plist;
@@ -1605,6 +1615,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = sa.com.Fazaa.Wishy;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = WishyLiveProfile15Tem;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
@@ -1624,10 +1635,12 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = Wishy/Wishy.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 8;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
+				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 9;
 				DEVELOPMENT_ASSET_PATHS = "\"Wishy/Preview Content\"";
-				DEVELOPMENT_TEAM = CKZBH9QCG3;
+				DEVELOPMENT_TEAM = "";
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = CKZBH9QCG3;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Wishy/Info.plist;
@@ -1653,6 +1666,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = sa.com.Fazaa.Wishy;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = WishyLiveProfile15Tem;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;

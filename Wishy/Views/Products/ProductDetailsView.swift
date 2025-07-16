@@ -8,6 +8,7 @@
 import SwiftUI
 import PopupView
 import goSellSDK
+import PassKit
 
 struct ProductDetailsView: View {
     @EnvironmentObject var appState: AppState
@@ -42,6 +43,10 @@ struct ProductDetailsView: View {
     // اختيار وسيلة الدفع
     @State private var payHyper: Bool = true
     @State private var payTamara: Bool = false
+    @State private var showApplePaySheet = false
+    @State private var applePayCheckoutId: String?
+    @State private var applePayAmount: Double = 0.0
+    let canShowApplePay: Bool = PKPaymentAuthorizationViewController.canMakePayments(usingNetworks: [.visa, .masterCard, .mada])
 
     var body: some View {
         VStack {
@@ -211,20 +216,30 @@ struct ProductDetailsView: View {
                     }
                     
                     // زر الدفع
-                    Button {
-                        if payHyper {
+                    if payHyper && selectedBrand == .apple && canShowApplePay {
+                        ApplePayButtonView {
                             startHyperpayPayment(for: selectedGroupId, isShare: selectedIsShare)
-                        } else if payTamara {
-                            startTamaraCheckout(for: selectedGroupId, isShare: selectedIsShare)
+                            showPaymentOptions = false
                         }
-                        showPaymentOptions = false
-                    } label: {
-                        Text("الاستمرار للدفع")
-                            .font(.system(size: 17, weight: .bold))
-                            .frame(maxWidth: .infinity)
+                        .frame(height: 50)
+                        .padding(.top, 6)
+                        .padding(.bottom, 8)
+                    } else {
+                        Button {
+                            if payHyper {
+                                startHyperpayPayment(for: selectedGroupId, isShare: selectedIsShare)
+                            } else if payTamara {
+                                startTamaraCheckout(for: selectedGroupId, isShare: selectedIsShare)
+                            }
+                            showPaymentOptions = false
+                        } label: {
+                            Text("الاستمرار للدفع")
+                                .font(.system(size: 17, weight: .bold))
+                                .frame(maxWidth: .infinity)
+                        }
+                        .buttonStyle(GradientPrimaryButton(fontSize: 17, fontWeight: .bold, background: Color.primaryGradientColor(), foreground: .white, height: 50, radius: 14))
+                        .padding(.vertical, 10)
                     }
-                    .buttonStyle(GradientPrimaryButton(fontSize: 17, fontWeight: .bold, background: Color.primaryGradientColor(), foreground: .white, height: 50, radius: 14))
-                    .padding(.vertical, 10)
                 }
                 .padding(.top, 6)
                 .padding(.horizontal, 22)
@@ -244,7 +259,7 @@ struct ProductDetailsView: View {
               .useKeyboardSafeArea(true)
         }
         .sheet(isPresented: $showBrandSheet) {
-            BrandSheet(selectedBrand: $selectedBrand, showBrandSheet: $showBrandSheet)
+            BrandSheet(selectedBrand: $selectedBrand, showBrandSheet: $showBrandSheet, canShowApplePay: canShowApplePay)
         }
         .fullScreenCover(isPresented: $hyperPaymentViewModel.isShowingCheckout) {
             if let checkoutId = hyperPaymentViewModel.checkoutId {
@@ -263,6 +278,24 @@ struct ProductDetailsView: View {
                     onDismiss: {
                         // أغلق الشاشة فقط هنا!
                         hyperPaymentViewModel.isShowingCheckout = false
+                    }
+                )
+            }
+        }
+        .fullScreenCover(isPresented: $showApplePaySheet) {
+            if let checkoutId = applePayCheckoutId {
+                ApplePayControllerView(
+                    checkoutId: checkoutId,
+                    amount: applePayAmount,
+                    onResult: { result in
+                        showApplePaySheet = false
+                        switch result {
+                        case .success(let hyperpayId):
+                            checkHyperpayStatus(resourcePath: hyperpayId)
+                        case .failure(let error):
+                            orderViewModel.errorMessage = error.localizedDescription
+                            orderViewModel.isLoading = false
+                        }
                     }
                 )
             }
@@ -514,7 +547,7 @@ struct ProductDetailsView: View {
             appRouter.navigateBack()
         }
     }
-
+    
     func startHyperpayPayment(for groupId: String, isShare: Bool) {
         let amount = exploreCost
         orderViewModel.isLoading = true
@@ -526,13 +559,26 @@ struct ProductDetailsView: View {
         ) { checkoutId in
             if let id = checkoutId {
                 currentHyperpayId = id
-                hyperPaymentViewModel.checkoutId = id
-                hyperPaymentViewModel.isShowingCheckout = true
+                if selectedBrand == .apple {
+                    if !canShowApplePay {
+                        orderViewModel.errorMessage = "جهازك لا يدعم Apple Pay أو لم يتم إضافة بطاقة"
+                        return
+                    }
+                    showApplePaySheet(checkoutId: id, amount: amount)
+                } else {
+                    hyperPaymentViewModel.isShowingCheckout = true
+                }
             } else {
-                orderViewModel.errorMessage = "فشل في بدء عملية الدفع"
-                orderViewModel.isLoading = false
+                orderViewModel.errorMessage = "تعذر بدء عملية الدفع"
             }
         }
+    }
+    
+    // وظيفة عرض Apple Pay Sheet (ضعها في extension)
+    func showApplePaySheet(checkoutId: String, amount: Double) {
+        applePayCheckoutId = checkoutId
+        applePayAmount = amount
+        showApplePaySheet = true
     }
 
     func checkHyperpayStatus(resourcePath: String) {

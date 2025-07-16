@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import PassKit
 
 struct AddBalanceView: View {
     @State private var coupon = ""
@@ -22,6 +23,10 @@ struct AddBalanceView: View {
     @State private var selectedBrand: HyperpayBrand = .mada
     @State private var currentHyperpayId: String?
     @State private var showBrandSheet = false
+    @State private var showApplePaySheet = false
+    @State private var applePayCheckoutId: String?
+    @State private var applePayAmount: Double = 0.0
+    let canShowApplePay: Bool = PKPaymentAuthorizationViewController.canMakePayments(usingNetworks: [.visa, .masterCard, .mada])
 
     init(showAddBalanceView: Binding<Bool>, onsuccess: @escaping () -> Void) {
         _showAddBalanceView = showAddBalanceView
@@ -66,13 +71,27 @@ struct AddBalanceView: View {
             }
             
 
-            Button {
-                checkCoupon()
-            } label: {
-                Text(LocalizedStringKey.send)
+            if selectedBrand == .apple && canShowApplePay {
+                // زر Apple Pay الرسمي
+                ApplePayButtonView {
+                    if let amountValue = amount.toDouble(), amountValue > 0 {
+                        startHyperpayPayment(amount: amountValue)
+                    } else {
+                        orderViewModel.errorMessage = "يرجى إدخال المبلغ بشكل صحيح"
+                    }
+                }
+                .frame(height: 48)
+                .padding(.horizontal)
+            } else {
+                // زر دفع عادي
+                Button {
+                    checkCoupon()
+                } label: {
+                    Text(LocalizedStringKey.send)
+                }
+                .buttonStyle(PrimaryButton(fontSize: 18, fontWeight: .bold, background: .primary(), foreground: .white, height: 48, radius: 12))
+                .disabled(orderViewModel.isLoading)
             }
-            .buttonStyle(PrimaryButton(fontSize: 18, fontWeight: .bold, background: .primary(), foreground: .white, height: 48, radius: 12))
-            .disabled(orderViewModel.isLoading)
 
             Spacer()
         }
@@ -82,7 +101,7 @@ struct AddBalanceView: View {
             Alert(title: Text(LocalizedStringKey.error), message: Text(alertMessage), dismissButton: .default(Text(LocalizedStringKey.ok)))
         }
         .sheet(isPresented: $showBrandSheet) {
-            BrandSheet(selectedBrand: $selectedBrand, showBrandSheet: $showBrandSheet)
+            BrandSheet(selectedBrand: $selectedBrand, showBrandSheet: $showBrandSheet, canShowApplePay: canShowApplePay)
         }
         .overlay(
             MessageAlertObserverView(
@@ -107,6 +126,24 @@ struct AddBalanceView: View {
                     onDismiss: {
                         // أغلق الشاشة فقط هنا!
                         hyperPaymentViewModel.isShowingCheckout = false
+                    }
+                )
+            }
+        }
+        .fullScreenCover(isPresented: $showApplePaySheet) {
+            if let checkoutId = applePayCheckoutId {
+                ApplePayControllerView(
+                    checkoutId: checkoutId,
+                    amount: applePayAmount,
+                    onResult: { result in
+                        showApplePaySheet = false
+                        switch result {
+                        case .success(let hyperpayId):
+                            checkHyperpayStatus(resourcePath: hyperpayId)
+                        case .failure(let error):
+                            orderViewModel.errorMessage = error.localizedDescription
+                            orderViewModel.isLoading = false
+                        }
                     }
                 )
             }
@@ -140,13 +177,28 @@ struct AddBalanceView: View {
         ) { checkoutId in
             if let id = checkoutId {
                 currentHyperpayId = id
-                hyperPaymentViewModel.checkoutId = id
-                hyperPaymentViewModel.isShowingCheckout = true
+                if selectedBrand == .apple {
+                    if !canShowApplePay {
+                        orderViewModel.errorMessage = "جهازك لا يدعم Apple Pay أو لم يتم إضافة بطاقة"
+                        orderViewModel.isLoading = false
+                        return
+                    }
+                    showApplePaySheet(checkoutId: id, amount: amount)
+                } else {
+                    hyperPaymentViewModel.isShowingCheckout = true
+                }
             } else {
-                orderViewModel.errorMessage = "فشل في بدء عملية الدفع"
+                orderViewModel.errorMessage = "تعذر بدء عملية الدفع"
                 orderViewModel.isLoading = false
             }
         }
+    }
+
+    // وظيفة عرض Apple Pay Sheet (ضعها في extension)
+    func showApplePaySheet(checkoutId: String, amount: Double) {
+        applePayCheckoutId = checkoutId
+        applePayAmount = amount
+        showApplePaySheet = true
     }
 
     func checkHyperpayStatus(resourcePath: String) {

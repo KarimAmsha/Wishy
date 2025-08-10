@@ -351,13 +351,14 @@ struct CheckoutView: View {
             return ""
         }()
 
-        if selectedPayment == .hyperpay && canShowApplePay {
-            // زر Apple Pay الرسمي فقط!
-            ApplePayButtonView {
-                // عند الضغط على زر أبل باي
-                if let amount = cartViewModel.cartTotal?.final_total {
-                    startHyperpayPayment(amount: amount)
-                }
+        if selectedPayment == .hyperpay,
+           selectedBrand == .apple,
+           canShowApplePay,
+           let amount = cartViewModel.cartTotal?.final_total,
+           amount > 0
+        {
+            ApplePaySection {
+                startHyperpayPayment(amount: amount)
             }
             .frame(height: 48)
             .padding(.vertical, 8)

@@ -216,8 +216,11 @@ struct ProductDetailsView: View {
                     }
                     
                     // زر الدفع
-                    if payHyper && selectedBrand == .apple && canShowApplePay {
-                        ApplePayButtonView {
+                    if payHyper,
+                       selectedBrand == .apple,
+                       canShowApplePay
+                    {
+                        ApplePaySection {
                             startHyperpayPayment(for: selectedGroupId, isShare: selectedIsShare)
                             showPaymentOptions = false
                         }

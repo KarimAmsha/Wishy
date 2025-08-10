@@ -233,9 +233,9 @@
 		1EFB9B352C1C4CFE00C15CE4 /* VIPGiftView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EFB9B342C1C4CFE00C15CE4 /* VIPGiftView.swift */; };
 		1EFB9B372C1C624B00C15CE4 /* EventListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EFB9B362C1C624B00C15CE4 /* EventListView.swift */; };
 		520BB0382DC959AC00DB6315 /* SafariView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 520BB0372DC959AB00DB6315 /* SafariView.swift */; };
+		521C5EC72E47CCE20089EA38 /* ipworks3ds_sdk_deploy_9048.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 526644B52E17ACE9005DEA6D /* ipworks3ds_sdk_deploy_9048.xcframework */; };
+		521C5EC82E47CCE20089EA38 /* ipworks3ds_sdk_deploy_9048.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 526644B52E17ACE9005DEA6D /* ipworks3ds_sdk_deploy_9048.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		52348E0B2DD8B84F00E4EBE5 /* ValidatedTextEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52348E0A2DD8B84E00E4EBE5 /* ValidatedTextEditor.swift */; };
-		526644BA2E17AD31005DEA6D /* ipworks3ds_sdk_9048.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 526644B42E17ACE9005DEA6D /* ipworks3ds_sdk_9048.xcframework */; };
-		526644BB2E17AD31005DEA6D /* ipworks3ds_sdk_9048.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 526644B42E17ACE9005DEA6D /* ipworks3ds_sdk_9048.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		526644BF2E17AD36005DEA6D /* OPPWAMobile.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 526644B62E17ACE9005DEA6D /* OPPWAMobile.xcframework */; };
 		526644C02E17AD36005DEA6D /* OPPWAMobile.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 526644B62E17ACE9005DEA6D /* OPPWAMobile.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		526644C72E17C6AF005DEA6D /* HyperPaymentViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 526644C62E17C6AA005DEA6D /* HyperPaymentViewModel.swift */; };
@@ -261,7 +261,7 @@
 			dstSubfolderSpec = 10;
 			files = (
 				526644C02E17AD36005DEA6D /* OPPWAMobile.xcframework in Embed Frameworks */,
-				526644BB2E17AD31005DEA6D /* ipworks3ds_sdk_9048.xcframework in Embed Frameworks */,
+				521C5EC82E47CCE20089EA38 /* ipworks3ds_sdk_deploy_9048.xcframework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -496,7 +496,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				526644BA2E17AD31005DEA6D /* ipworks3ds_sdk_9048.xcframework in Frameworks */,
 				1ECC94A72BDC5D8B002BFE54 /* FirebaseInAppMessagingSwift-Beta in Frameworks */,
 				1ECC94972BDC5D8B002BFE54 /* FirebaseDatabaseSwift in Frameworks */,
 				1EA740562BFBADC20028AAD0 /* RefreshableScrollView in Frameworks */,
@@ -522,6 +521,7 @@
 				1ECC94892BDC5D8B002BFE54 /* FirebaseAnalyticsWithoutAdIdSupport in Frameworks */,
 				1ECC94B72BDC5D8B002BFE54 /* FirebaseStorageCombine-Community in Frameworks */,
 				1ECC949D2BDC5D8B002BFE54 /* FirebaseFirestoreCombine-Community in Frameworks */,
+				521C5EC72E47CCE20089EA38 /* ipworks3ds_sdk_deploy_9048.xcframework in Frameworks */,
 				1ECC94832BDC5D8B002BFE54 /* FirebaseAnalytics in Frameworks */,
 				1ECC94932BDC5D8B002BFE54 /* FirebaseCrashlytics in Frameworks */,
 				1ECC948D2BDC5D8B002BFE54 /* FirebaseAppDistribution-Beta in Frameworks */,
@@ -1586,7 +1586,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 9;
+				CURRENT_PROJECT_VERSION = 10;
 				DEVELOPMENT_ASSET_PATHS = "\"Wishy/Preview Content\"";
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = CKZBH9QCG3;
@@ -1637,7 +1637,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 9;
+				CURRENT_PROJECT_VERSION = 10;
 				DEVELOPMENT_ASSET_PATHS = "\"Wishy/Preview Content\"";
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = CKZBH9QCG3;

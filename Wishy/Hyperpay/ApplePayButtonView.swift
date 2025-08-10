@@ -27,3 +27,22 @@ struct ApplePayButtonView: UIViewRepresentable {
         }
     }
 }
+
+struct ApplePaySection: View {
+    var action: () -> Void
+    
+    var body: some View {
+        VStack(spacing: 8) {
+            ApplePayButtonView(action: action)
+                .frame(height: 50)
+            
+            if !PKPaymentAuthorizationViewController.canMakePayments(usingNetworks: [.visa, .masterCard, .mada]) {
+                Text("أضف بطاقة إلى Apple Wallet لتفعيل Apple Pay")
+                    .font(.footnote)
+                    .foregroundColor(.orange)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal, 8)
+            }
+        }
+    }
+}

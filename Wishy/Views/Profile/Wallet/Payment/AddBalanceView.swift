@@ -70,10 +70,9 @@ struct AddBalanceView: View {
                 LoadingView()
             }
             
-
-            if selectedBrand == .apple && canShowApplePay {
-                // زر Apple Pay الرسمي
-                ApplePayButtonView {
+            if selectedBrand == .apple, canShowApplePay
+            {
+                ApplePaySection {
                     if let amountValue = amount.toDouble(), amountValue > 0 {
                         startHyperpayPayment(amount: amountValue)
                     } else {
@@ -82,6 +81,7 @@ struct AddBalanceView: View {
                 }
                 .frame(height: 48)
                 .padding(.horizontal)
+                .padding(.vertical, 8)
             } else {
                 // زر دفع عادي
                 Button {

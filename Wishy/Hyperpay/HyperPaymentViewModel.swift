@@ -70,7 +70,15 @@ class HyperPaymentViewModel: ObservableObject {
 
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
-        let bodyString = "type=\(brandType)&amount=\(amount)"
+//        let bodyString = "type=\(brandType)&amount=\(amount)"
+        let amountStr: String = {
+            let f = NumberFormatter()
+            f.locale = Locale(identifier: "en_US_POSIX")
+            f.minimumFractionDigits = 2
+            f.maximumFractionDigits = 2
+            return f.string(from: NSNumber(value: amount)) ?? String(format: "%.2f", amount)
+        }()
+        let bodyString = "type=\(brandType)&amount=\(amountStr)"
         request.httpBody = bodyString.data(using: .utf8)
         request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
         request.setValue(token, forHTTPHeaderField: "token")
@@ -113,8 +121,87 @@ class HyperPaymentViewModel: ObservableObject {
     }
 
     /// للتحقق من الدفع بعد إنهاء العملية
-    func checkPaymentStatus(hyperpayId: String, brandType: Int = 1, completion: @escaping (Bool, HyperpayCheckStatusResponse?) -> Void) {
-        guard let url = URL(string: "\(APIConfig.statusEndpoint)?hyperpay_id=\(hyperpayId)") else {
+//    func checkPaymentStatus(hyperpayId: String, brandType: Int = 1, completion: @escaping (Bool, HyperpayCheckStatusResponse?) -> Void) {
+//        guard let url = URL(string: "\(APIConfig.statusEndpoint)?hyperpay_id=\(hyperpayId)") else {
+//            completion(false, nil)
+//            return
+//        }
+//        guard let token = userSettings.token else {
+//            DispatchQueue.main.async {
+//                self.errorMessage = "يرجى تسجيل الدخول أولاً"
+//                completion(false, nil)
+//            }
+//            return
+//        }
+//        print("urlurl \(url)")
+//        print("hyperpayId \(hyperpayId)")
+//        print("brandType \(brandType)")
+//
+//        var request = URLRequest(url: url)
+//        request.httpMethod = "POST"
+//        let bodyString = "type=\(brandType)"
+//        request.httpBody = bodyString.data(using: .utf8)
+//        request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
+//        request.setValue(token, forHTTPHeaderField: "token")
+//        request.setValue("ar", forHTTPHeaderField: "Accept-Language")
+//
+//        URLSession.shared.dataTask(with: request) { data, _, _ in
+//            guard let data = data else {
+//                DispatchQueue.main.async {
+//                    self.errorMessage = "لم يتم الحصول على بيانات الحالة"
+//                    completion(false, nil)
+//                }
+//                return
+//            }
+//            do {
+//                let decoded = try JSONDecoder().decode(HyperpayCheckStatusResponse.self, from: data)
+//                print("2222 \(decoded.items)")
+//
+//                // مثال على فحص النتيجة والكود بوضوح
+//                let successCodes = ["000.000.000", "000.100.110", "000.200.000", "000.200.100"]
+//                if decoded.status, let code = decoded.items?.result?.code, successCodes.contains(code) {
+//                    DispatchQueue.main.async {
+//                        self.paymentStatus = "success"
+//                        completion(true, decoded)
+//                    }
+//                } else {
+//                    DispatchQueue.main.async {
+//                        self.errorMessage = decoded.items?.result?.description ?? decoded.message ?? "فشلت عملية الدفع"
+//                        self.paymentStatus = "fail"
+//                        completion(false, decoded)
+//                    }
+//                }
+//            } catch {
+//                DispatchQueue.main.async {
+//                    self.errorMessage = "خطأ في التحقق من الدفع"
+//                    self.paymentStatus = "fail"
+//                    completion(false, nil)
+//                }
+//            }
+//        }.resume()
+//    }
+    
+    private func isHyperpaySuccess(_ code: String) -> Bool {
+        let pattern = #"""
+        ^(
+            (000\.000\.|000\.100\.1|000\.[36]) |
+            (000\.400\.0[^3]|000\.400\.100)    |
+            (000\.200)                         |
+            (800\.400\.5|100\.400\.500)
+        )
+        """#
+        let compact = pattern.replacingOccurrences(of: "\\s", with: "", options: .regularExpression)
+        return code.range(of: compact, options: .regularExpression) != nil
+    }
+    
+    func checkPaymentStatus(hyperpayId: String,
+                            brandType: Int = 1,
+                            completion: @escaping (Bool, HyperpayCheckStatusResponse?) -> Void) {
+        
+        let encId = hyperpayId.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? hyperpayId
+        
+        // رابط الـ API (فيه فقط الـ hyperpay_id بالـ query)
+        guard let url = URL(string: "\(APIConfig.statusEndpoint)?hyperpay_id=\(encId)") else {
             completion(false, nil)
             return
         }
@@ -125,18 +212,19 @@ class HyperPaymentViewModel: ObservableObject {
             }
             return
         }
-        print("urlurl \(url)")
-        print("hyperpayId \(hyperpayId)")
-        print("brandType \(brandType)")
-
+        
         var request = URLRequest(url: url)
-        request.httpMethod = "POST"
-        let bodyString = "type=\(brandType)"
-        request.httpBody = bodyString.data(using: .utf8)
-        request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
+        request.httpMethod = "POST" // ⬅️ POST
         request.setValue(token, forHTTPHeaderField: "token")
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         request.setValue("ar", forHTTPHeaderField: "Accept-Language")
-
+        
+        // البودي يحتوي على type فقط
+        let body: [String: Any] = [
+            "type": brandType
+        ]
+        request.httpBody = try? JSONSerialization.data(withJSONObject: body)
+        
         URLSession.shared.dataTask(with: request) { data, _, _ in
             guard let data = data else {
                 DispatchQueue.main.async {
@@ -147,20 +235,17 @@ class HyperPaymentViewModel: ObservableObject {
             }
             do {
                 let decoded = try JSONDecoder().decode(HyperpayCheckStatusResponse.self, from: data)
-                print("2222 \(decoded.items)")
-
-                // مثال على فحص النتيجة والكود بوضوح
-                if decoded.status, let code = decoded.items?.result?.code, code == "000.200.000" || code == "000.200.100" {
-                    DispatchQueue.main.async {
-                        self.paymentStatus = "success"
-                        completion(true, decoded)
-                    }
+                
+                let statusFromBackend = decoded.status
+                let statusFromCode = self.isHyperpaySuccess(decoded.items?.result?.code ?? "")
+                
+                if statusFromBackend || statusFromCode {
+                    self.paymentStatus = "success"
+                    completion(true, decoded)
                 } else {
-                    DispatchQueue.main.async {
-                        self.errorMessage = decoded.items?.result?.description ?? decoded.message ?? "فشلت عملية الدفع"
-                        self.paymentStatus = "fail"
-                        completion(false, decoded)
-                    }
+                    self.errorMessage = decoded.items?.result?.description ?? decoded.message ?? "فشلت عملية الدفع"
+                    self.paymentStatus = "fail"
+                    completion(false, decoded)
                 }
             } catch {
                 DispatchQueue.main.async {

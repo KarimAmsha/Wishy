@@ -83,8 +83,11 @@ struct RetailPaymentView: View {
             }
 
             // زر Apple Pay الرسمي إذا تم اختياره وكان الجهاز يدعم
-            if payHyper && selectedBrand == .apple && canShowApplePay {
-                ApplePayButtonView {
+            if payHyper,
+               selectedBrand == .apple,
+               canShowApplePay
+            {
+                ApplePaySection {
                     if total.isEmpty {
                         wishesViewModel.errorMessage = "ادخل قيمة للاستمرار بالدفع!"
                         return

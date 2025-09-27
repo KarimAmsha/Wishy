@@ -9,7 +9,7 @@ import SwiftUI
 import Firebase
 import FirebaseMessaging
 import FirebaseCrashlytics
-import goSellSDK
+//import goSellSDK
 
 @main
 struct WishyApp: App {
@@ -47,8 +47,8 @@ struct WishyApp: App {
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-        GoSellSDK.secretKey = SecretKey(sandbox:    "sk_test_YJlOMLfZPekucyKhnwSDUzog",
-                                        production:    "sk_live_zqam2B5Xng8jrhPGpN4dK7Qe")
+//        GoSellSDK.secretKey = SecretKey(sandbox:    "sk_test_YJlOMLfZPekucyKhnwSDUzog",
+//                                        production:    "sk_live_zqam2B5Xng8jrhPGpN4dK7Qe")
 
         configureNotifications(application)
         Crashlytics.crashlytics().setCrashlyticsCollectionEnabled(true)

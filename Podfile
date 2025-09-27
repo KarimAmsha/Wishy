@@ -6,7 +6,7 @@ target 'Wishy' do
   use_frameworks!
 
   # Pods for Wishy
-  pod 'goSellSDK'
-  pod 'TapApplePayKit-iOS'
+#  pod 'goSellSDK'
+#  pod 'TapApplePayKit-iOS'
   pod 'TamaraSDK'
 end

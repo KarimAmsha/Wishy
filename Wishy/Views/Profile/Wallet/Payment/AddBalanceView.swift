@@ -148,6 +148,12 @@ struct AddBalanceView: View {
                 )
             }
         }
+        // ⬅️ Overlay إضافي للودينج الخاص بـ HyperPaymentViewModel (مع الحفاظ على القديم)
+        .overlay {
+            if hyperPaymentViewModel.isLoading {
+                LoadingView()
+            }
+        }
     }
 
     private func checkCoupon() {
@@ -227,3 +233,4 @@ struct AddBalanceView: View {
         }
     }
 }
+

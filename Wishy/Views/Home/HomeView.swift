@@ -112,6 +112,8 @@ struct HomeView: View {
             getHome()
             viewModel.fetchContactItems()
             refreshFcmToken()
+            print("token \(UserSettings.shared.token)")
+
         }
     }
     

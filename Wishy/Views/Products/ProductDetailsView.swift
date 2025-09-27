@@ -7,7 +7,7 @@
 
 import SwiftUI
 import PopupView
-import goSellSDK
+//import goSellSDK
 import PassKit
 
 struct ProductDetailsView: View {
@@ -311,6 +311,12 @@ struct ProductDetailsView: View {
             }
         }
         .overlay(alertObservers)
+        // ⬅️ Overlay إضافي للودينج الخاص بـ HyperPaymentViewModel (مع الحفاظ على القديم)
+        .overlay {
+            if hyperPaymentViewModel.isLoading {
+                LoadingView()
+            }
+        }
         .onAppear {
             getDetails()
         }

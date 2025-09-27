@@ -1,7 +1,7 @@
 // RetailPaymentView.swift
 
 import SwiftUI
-import goSellSDK
+//import goSellSDK
 import TamaraSDK
 import PassKit
 
@@ -185,6 +185,12 @@ struct RetailPaymentView: View {
                 }
             }
         }
+        // ⬅️ Overlay إضافي للودينج الخاص بـ HyperPaymentViewModel (مع الحفاظ على القديم)
+        .overlay {
+            if hyperPaymentViewModel.isLoading {
+                LoadingView()
+            }
+        }
         .onAppear {
             laodWishData()
         }
@@ -339,3 +345,4 @@ struct RetailCheckboxButton: View {
         .buttonStyle(PlainButtonStyle())
     }
 }
+

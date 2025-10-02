@@ -68,6 +68,16 @@ enum HyperpayBrand: Int, CaseIterable, Identifiable {
         case .apple: return "applelogo"
         }
     }
+
+    /// اسم عربي عام لعرضه في الواجهات (بدون ذكر Apple Pay داخل الشيت)
+    var arabicName: String {
+        switch self {
+        case .visa: return "فيزا"
+        case .master: return "ماستر كارد"
+        case .mada: return "مدى"
+        case .apple: return "المحفظة الرقمية"
+        }
+    }
 }
 
 struct CheckoutView: View {
@@ -1031,7 +1041,8 @@ struct PaymentSection: View {
                         showBrandSheet = true
                     } label: {
                         HStack {
-                            Text(selectedBrand.displayName)
+                            // عرض الاسم العربي العام بدل الاسم الإنجليزي
+                            Text(selectedBrand.arabicName)
                                 .foregroundColor(.primary)
                             Spacer()
                             Image(systemName: "chevron.down")
@@ -1100,6 +1111,11 @@ struct BrandSheet: View {
         return base
     }
 
+    // احتفظنا بالدالة التي اخترتها، لكنها الآن تعتمد على الخاصية العامة
+    private func arabicName(for brand: HyperpayBrand) -> String {
+        return brand.arabicName
+    }
+
     var body: some View {
         VStack(spacing: 16) {
             Capsule()
@@ -1119,10 +1135,8 @@ struct BrandSheet: View {
                     showBrandSheet = false
                 } label: {
                     HStack {
-                        Image(systemName: brand.iconName)
-                            .foregroundColor(.black)
-                            .frame(width: 24)
-                        Text(brand.displayName)
+                        // بدون أيقونات أو شعار
+                        Text(arabicName(for: brand))
                             .foregroundColor(.primary)
                             .fontWeight(selectedBrand == brand ? .bold : .regular)
                         Spacer()

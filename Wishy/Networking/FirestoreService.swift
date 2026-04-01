@@ -48,35 +48,38 @@ class FirestoreService {
     
     // Upload Multi Images
     func uploadMultipleImages2(images: [UIImage?], id: String, completion: @escaping ([String]?, Bool) -> Void) {
-        var uploadedImageUrls: [String] = []
-        var uploadCount = 0
-        
         guard !images.isEmpty else {
             completion([], false)
             return
         }
-        
+
+        var uploadedImageUrls: [String] = []
+        let dispatchGroup = DispatchGroup()
+        var allUploadsSucceeded = true
+
         for (index, image) in images.enumerated() {
             var imageName = ""
             switch index {
-                case 0: imageName = "image"
-                case 1: imageName = "id_image"
-                default: break
+            case 0: imageName = "image"
+            case 1: imageName = "id_image"
+            default: break
             }
-            
-            uploadImageWithThumbnail(image: image, id: id, imageName: imageName) { (url, success) in
-                uploadCount += 1
-                
+
+            dispatchGroup.enter()
+            uploadImageWithThumbnail(image: image, id: id, imageName: imageName) { url, success in
                 if let url = url {
                     uploadedImageUrls.append(url)
+                } else {
+                    allUploadsSucceeded = false
                 }
-                
-                if uploadCount == images.count {
-                    completion(uploadedImageUrls, true)
-                } else if !success {
-                    completion(nil, false)
-                }
+                if !success { allUploadsSucceeded = false }
+                dispatchGroup.leave()
             }
+        }
+
+        dispatchGroup.notify(queue: .main) {
+            let success = allUploadsSucceeded && uploadedImageUrls.count == images.count
+            completion(uploadedImageUrls, success)
         }
     }
     
